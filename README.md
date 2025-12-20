@@ -3,15 +3,6 @@
 <div align="center">
   <h3>A Collaborative Full-Stack Task Management Platform</h3>
   <p>Streamline your workflow, boost productivity, and achieve your goals</p>
-  
-  <p>
-    <a href="#about">About</a> •
-    <a href="#features">Features</a> •
-    <a href="#tech-stack">Tech Stack</a> •
-    <a href="#getting-started">Getting Started</a> •
-    <a href="#team">Team</a> •
-    <a href="#contributing">Contributing</a>
-  </p>
 </div>
 
 ---
