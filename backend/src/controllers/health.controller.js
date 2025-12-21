@@ -7,5 +7,5 @@
  */
 
 export const healthCheck = asyncHandler(async (req, res) => {
-    res.json({ message: "OK" });
+    res.json({ message: "Api is working..." });
 });

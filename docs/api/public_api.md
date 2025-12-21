@@ -20,7 +20,7 @@ curl -X GET http://localhost:5000/api/health
 **Status:** `200 OK`
 ```json
 {
-  "message": "OK"
+  "message": "Api is working..."
 }
 ```
 
@@ -59,7 +59,7 @@ Allows visitors (unauthenticated users) to submit support inquiries or messages 
 ```json
 {
   "success": true,
-  "message": "Contact us entry created successfully",
+  "message": "Your contact us message has been sent successfully",
   "data": {
     "name": "Jane Doe",
     "subject": "Enterprise Pricing Inquiry"
