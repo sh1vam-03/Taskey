@@ -1,99 +1,198 @@
-const prisma = require('../utils/prisma');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+import * as authService from "../services/auth.service";
+import asyncHandler from "../utils/asyncHandler";
+import ApiError from "../utils/appError";
 
-const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '30d',
+
+/**
+ * @route POST /api/auth/register
+ * @desc Register a new user and send OTP
+ * @access Public
+ */
+
+export const signup = asyncHandler(async (req, res) => {
+    const { name, email, password } = req.body;
+
+    // Input Validation
+    if (!name || !email || !password) {
+        throw new ApiError(400, "All fields are required");
+    }
+
+    // Call Service
+    const result = await authService.signup(name, email, password);
+
+    // Send Response
+    return res.status(201).json({
+        success: true,
+        message: result.message,
+        data: {
+            email: result.email,
+        },
     });
-};
 
-// @desc    Register a new user
-// @route   POST /api/auth/signup
-// @access  Public
-const signup = async (req, res) => {
+});
+
+
+/**
+ * @route POST /api/auth/verify-otp
+ * @desc Verify OTP and return JWT token
+ * @access Public
+ */
+
+export const verifyOtp = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+
+    // Input Validation
+    if (!email || !otp) {
+        throw new ApiError(400, "Please provide email and OTP");
+    }
+
+    // Call Service
+    const result = await authService.verifyOtp(email, otp);
+
+    // Send Response
+    return res.status(200).json({
+        success: true,
+        message: "Email verified successfully",
+        data: {
+            token: result.token,
+            user: result.user,
+        },
+    });
+});
+
+
+/**
+ * @route POST /api/auth/login
+ * @desc Login a user and return JWT token
+ * @access Public
+ */
+
+export const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
-    try {
-        const userExists = await prisma.user.findUnique({
-            where: { email },
-        });
-
-        if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const user = await prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-            },
-        });
-
-        if (user) {
-            res.status(201).json({
-                _id: user.id,
-                email: user.email,
-                token: generateToken(user.id),
-            });
-        } else {
-            res.status(400).json({ message: 'Invalid user data' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    // Input Validation
+    if (!email || !password) {
+        throw new ApiError(400, "Please provide email and password");
     }
-};
 
-// @desc    Auth user & get token
-// @route   POST /api/auth/login
-// @access  Public
-const login = async (req, res) => {
-    const { email, password } = req.body;
+    // Call Service
+    const result = await authService.login(email, password);
 
-    try {
-        const user = await prisma.user.findUnique({
-            where: { email },
-        });
+    // Send Response
+    return res.status(200).json({
+        success: true,
+        message: "Login successful",
+        data: {
+            token: result.token,
+            user: result.user,
+        },
+    });
+});
 
-        if (user && (await bcrypt.compare(password, user.password))) {
-            res.json({
-                _id: user.id,
-                email: user.email,
-                token: generateToken(user.id),
-            });
-        } else {
-            res.status(401).json({ message: 'Invalid email or password' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+
+/**
+ * @route Post /api/auth/resend-otp
+ * @desc Reset otp and return JWT token
+ * @access Public
+ */
+
+export const otpRequest = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    // Input Validation
+    if (!email) {
+        throw new ApiError(400, "Please provide email");
     }
-};
 
-// @desc    Get user profile
-// @route   GET /api/auth/me
-// @access  Private
-const getProfile = async (req, res) => {
-    try {
-        const user = await prisma.user.findUnique({
-            where: { id: req.user.id },
-            select: {
-                id: true,
-                email: true,
-                createdAt: true,
-            },
-        });
+    // Call Service
+    const result = await authService.otpRequest(email);
 
-        if (user) {
-            res.json(user);
-        } else {
-            res.status(404).json({ message: 'User not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    // Send Response
+    return res.status(200).json({
+        success: true,
+        data: {
+            message: result.message,
+        },
+    });
+});
+
+
+/**
+ * @route POST /api/auth/forgot-password
+ * @desc Forgot password and send OTP
+ * @access Public
+ */
+
+export const forgotPasswordOtp = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    // Input Validation
+    if (!email) {
+        throw new ApiError(400, "Please provide email");
     }
-};
 
-module.exports = { signup, login, getProfile };
+    // Call Service
+    const result = await authService.forgotPasswordOtp(email);
+
+    // Send Response
+    return res.status(200).json({
+        success: true,
+        data: {
+            message: result.message,
+        },
+    });
+});
+
+/**
+ * @route POST /api/auth/reset-password
+ * @desc Reset password
+ * @access Public
+ */
+
+export const resetPassword = asyncHandler(async (req, res) => {
+    const { email, otp, password } = req.body;
+
+    // Input Validation
+    if (!email || !otp || !password) {
+        throw new ApiError(400, "Please provide email, OTP and password");
+    }
+
+    // Call Service
+    const result = await authService.resetPasswordOtp(email, otp, password);
+
+    // Send Response
+    return res.status(200).json({
+        success: true,
+        data: {
+            message: result.message,
+        },
+    });
+});
+
+
+/**
+ * @route POST /api/auth/logout
+ * @desc Logout user
+ * @access Public
+ */
+
+export const logout = asyncHandler(async (req, res) => {
+    const { userId } = req.body;
+
+    // Input Validation
+    if (!userId) {
+        throw new ApiError(400, "Please provide user ID");
+    }
+
+    // Call Service
+    const result = await authService.logout(userId);
+
+    // Send Response
+    return res.status(200).json({
+        success: true,
+        message: "Logout successfully",
+        data: {
+            email: result.email,
+        },
+    });
+});

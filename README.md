@@ -35,9 +35,9 @@ For detailed technical specifications, please refer to our internal documentatio
 
 - **[📖 Agile Scrum Backlog](docs/scrum_backlog.md)** - Feature roadmap, sprint plans, and task assignments.
 - **[🏗️ System Architecture](docs/architecture.md)** - High-level design, context diagrams, and tech stack details.
-- **[📡 API Reference](docs/api_reference.md)** - Endpoints, request/response schemas, and error codes.
 - **[🗄️ Database Schema](docs/database_schema.md)** - ER Diagrams, table definitions, and relationships.
 - **[🧪 Testing Strategy](docs/testing_strategy.md)** - QA protocols, testing tools, and coverage goals.
+- **[📡 API Documentation Hub](docs/api_documation.md)** - Central index for all API endpoints and specs.
 
 ---
 
