@@ -3,38 +3,29 @@
 <div align="center">
   <h3>A Collaborative Full-Stack Task Management Platform</h3>
   <p>Streamline your workflow, boost productivity, and achieve your goals</p>
-  
-  <p>
-    <a href="#about">About</a> •
-    <a href="#features">Features</a> •
-    <a href="#tech-stack">Tech Stack</a> •
-    <a href="#getting-started">Getting Started</a> •
-    <a href="#team">Team</a> •
-    <a href="#contributing">Contributing</a>
-  </p>
 </div>
 
 ---
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Backend Setup](#backend-setup)
-  - [Frontend Setup](#frontend-setup)
-- [Environment Variables](#environment-variables)
-- [Development Workflow](#development-workflow)
-- [Team](#team)
-- [Project Status](#project-status)
-- [Contributing](#contributing)
-- [Roadmap](#roadmap)
-- [License](#license)
-- [Documentation](#documentation)
-- [Support](#support)
+- [Overview](#-overview)
+- [Features](#-features)
+- [Project Structure](#-project-structure)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+  - [Prerequisites](#-prerequisites)
+  - [Backend Setup](#-backend-setup)
+  - [Frontend Setup](#-frontend-setup)
+- [Environment Variables](#-environment-variables)
+- [Development Workflow](#-development-workflow)
+- [Team](#-team)
+- [Project Status](#-project-status)
+- [Contributing](#-contributing)
+- [Roadmap](#-roadmap)
+- [License](#-license)
+- [Documentation](#-documentation)
+- [Support](#-support)
 
 ---
 
