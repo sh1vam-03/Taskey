@@ -7,7 +7,7 @@ This module handles the complete user lifecycle including registration, login, p
 ---
 
 ## 1. Register User (Signup)
-**Endpoint:** `POST /register`
+**Endpoint:** `POST /signup`
 
 Registers a new user in the system. Upon success, an OTP (One-Time Password) may be sent to the user's email for verification (depending on configuration).
 
@@ -90,33 +90,64 @@ Authenticates an existing user and issues a JWT token.
 
 ### 4.1 Forgot Password
 **Endpoint:** `POST /forgot-password`
-Initiates the password reset flow by sending an OTP.
+
+Initiates the password reset flow. Checks if the user exists and sends an OTP to their email.
 
 #### Request Body
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `email` | string | **Yes** | Registered email |
+
+#### Success Response (200 OK)
 ```json
-{ "email": "user@example.com" }
+{
+  "success": true,
+  "data": {
+    "message": "OTP sent successfully"
+  }
+}
 ```
 
 ### 4.2 Reset Password
 **Endpoint:** `POST /reset-password`
+
 Sets a new password using the verified OTP.
 
 #### Request Body
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `email` | string | **Yes** | User's email |
+| `otp` | string | **Yes** | 6-digit verification code |
+| `password` | string | **Yes** | New secure password |
+
+#### Success Response (200 OK)
 ```json
 {
-  "email": "user@example.com",
-  "otp": "123456",
-  "password": "newSecurePassword123"
+  "success": true,
+  "data": {
+    "message": "Password reset successfully"
+  }
 }
 ```
 
 ### 4.3 Resend OTP
-**Endpoint:** `POST /resend-otp`
-Re-sends the verification code if it expired.
+**Endpoint:** `POST /otp-request`
+
+Re-sends the verification code if the previous one expired.
 
 #### Request Body
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `email` | string | **Yes** | User's email |
+
+#### Success Response (200 OK)
 ```json
-{ "email": "user@example.com" }
+{
+  "success": true,
+  "data": {
+    "message": "OTP resent successfully"
+  }
+}
 ```
 
 ---
@@ -124,17 +155,20 @@ Re-sends the verification code if it expired.
 ## 5. Logout
 **Endpoint:** `POST /logout`
 
-Invalidates the user session (client-side should also remove the token).
+Invalidates the user session. The client should also delete the stored JWT.
 
 ### Request Body
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `userId` | number | **Yes** | ID of the user logging out |
 
-### Response (200 OK)
+### Success Response (200 OK)
 ```json
 {
   "success": true,
-  "message": "Logout successfully"
+  "message": "Logout successfully",
+  "data": {
+    "email": "user@example.com"
+  }
 }
 ```

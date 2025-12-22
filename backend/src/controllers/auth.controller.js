@@ -4,7 +4,7 @@ import ApiError from "../utils/appError";
 
 
 /**
- * @route POST /api/auth/register
+ * @route POST /api/auth/signup
  * @desc Register a new user and send OTP
  * @access Public
  */
@@ -91,7 +91,7 @@ export const login = asyncHandler(async (req, res) => {
 
 
 /**
- * @route Post /api/auth/resend-otp
+ * @route Post /api/auth/otp-request
  * @desc Reset otp and return JWT token
  * @access Public
  */
