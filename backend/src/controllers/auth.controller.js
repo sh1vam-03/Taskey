@@ -1,6 +1,6 @@
-import * as authService from "../services/auth.service";
-import asyncHandler from "../utils/asyncHandler";
-import ApiError from "../utils/appError";
+import * as authService from "../services/auth.service.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import ApiError from "../utils/ApiError.js";
 
 
 /**

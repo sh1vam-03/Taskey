@@ -1,10 +1,10 @@
-import prisma from "../config/db";
-import { hashPassword, comparePassword } from "../utils/bcrypt";
-import { signToken } from "../utils/jwt";
-import { generateOtp } from "../utils/otp";
+import prisma from "../config/db.js";
+import { hashPassword, comparePassword } from "../utils/bcrypt.js";
+import { signToken } from "../utils/jwt.js";
+import { generateOtp } from "../utils/otp.js";
 import { addMinutes } from "date-fns";
-import { OtpPurpose } from "../prisma/enums";
-import { ApiError } from "../utils/apiError";
+import { OtpPurpose } from "../prisma/enums.js";
+import { ApiError } from "../utils/ApiError.js";
 
 export const signup = async (name, email, password) => {
 
