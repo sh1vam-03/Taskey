@@ -11,5 +11,6 @@ router.post("/otp-request", authController.otpRequest);
 router.post("/forgot-password", authController.forgotPasswordOtp);
 router.post("/reset-password", authController.resetPassword);
 router.post("/logout", authMiddleware, authController.logout);
+router.delete("/me", authMiddleware, authController.deleteMyAccount);
 
 export default router;

@@ -92,7 +92,7 @@ export const login = asyncHandler(async (req, res) => {
 
 /**
  * @route Post /api/auth/otp-request
- * @desc Reset otp and return JWT token
+ * @desc Resend otp to user email
  * @access Public
  */
 
@@ -158,7 +158,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
     }
 
     // Call Service
-    const result = await authService.resetPasswordOtp(email, otp, password);
+    const result = await authService.resetPassword(email, otp, password);
 
     // Send Response
     return res.status(200).json({
@@ -176,8 +176,25 @@ export const resetPassword = asyncHandler(async (req, res) => {
  * @access Public
  */
 
-export const logout = asyncHandler(async (req, res) => {
-    const { userId } = req.body;
+export const logout = (req, res) => {
+    // user is already authenticated by authMiddleware
+    // nothing to do server-side for stateless JWT
+
+    res.status(200).json({
+        success: true,
+        message: "Logout successful",
+    });
+};
+
+
+/**
+ * @route DELETE /api/auth/me
+ * @desc Delete user account
+ * @access Private
+ */
+
+export const deleteMyAccount = asyncHandler(async (req, res) => {
+    const userId = req.user.id; //From JWT
 
     // Input Validation
     if (!userId) {
@@ -185,14 +202,13 @@ export const logout = asyncHandler(async (req, res) => {
     }
 
     // Call Service
-    const result = await authService.logout(userId);
+    const result = await authService.deleteMyAccount(userId);
 
     // Send Response
     return res.status(200).json({
         success: true,
-        message: "Logout successfully",
         data: {
-            email: result.email,
+            message: result.message,
         },
     });
 });

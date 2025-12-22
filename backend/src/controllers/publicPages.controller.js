@@ -1,6 +1,6 @@
-import * as publicPagesService from "../services/publicPages.service";
-import asyncHandler from "../utils/asyncHandler";
-import AppError from "../utils/appError";
+import * as publicPagesService from "../services/publicPages.service.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import ApiError from "../utils/ApiError.js";
 
 /**
  * @route POST /api/public-pages/contact-us
@@ -13,7 +13,7 @@ export const createContactUs = asyncHandler(async (req, res) => {
 
     // Input Validation
     if (!name || !email || !subject || !message) {
-        throw new AppError("All fields are required", 400);
+        throw new ApiError("All fields are required", 400);
     }
 
     // Call Service

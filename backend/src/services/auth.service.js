@@ -3,8 +3,8 @@ import { hashPassword, comparePassword } from "../utils/bcrypt.js";
 import { signToken } from "../utils/jwt.js";
 import { generateOtp } from "../utils/otp.js";
 import { addMinutes } from "date-fns";
-import { OtpPurpose } from "../prisma/enums.js";
-import { ApiError } from "../utils/ApiError.js";
+import { OtpPurpose } from "@prisma/client"
+import ApiError from "../utils/ApiError.js";
 
 export const signup = async (name, email, password) => {
 
@@ -228,8 +228,8 @@ export const forgotPasswordOtp = async (email) => {
         throw new ApiError(404, "User not found");
     }
 
-    if (user.isEmailVerified) {
-        throw new ApiError(400, "Email already verified");
+    if (!user.isEmailVerified) {
+        throw new ApiError(400, "Email not verified");
     }
 
     // Invalidate previous OTPs
@@ -326,8 +326,7 @@ export const resetPassword = async (email, otp, password) => {
 }
 
 
-export const logout = async (userId) => {
-
+export const deleteMyAccount = async (userId) => {
     // Find user by id
     const user = await prisma.user.findUnique({
         where: {
@@ -339,9 +338,12 @@ export const logout = async (userId) => {
         throw new ApiError(404, "User not found");
     }
 
-    // No DB action needed for stateless JWT
-    // Because we are using only access token which is need to remove from local storage and cache
-    // Note secure - when attacker are able to get access to access token then they can use it to make requests on behalf of user
-    // TODO : implement letter refresh token
-    return { message: "Logout successfully" };
+    // Delete user
+    await prisma.user.delete({
+        where: {
+            id: user.id
+        }
+    });
+
+    return { message: "Account deleted successfully" };
 }
