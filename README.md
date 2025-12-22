@@ -11,34 +11,20 @@
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
-- [Features](#-features)
+- [Documentation](#-documentation)
+- [Core Features](#-core-features)
 - [Project Structure](#-project-structure)
-- [Tech Stack](#-tech-stack)
+- [Tech Stack](#%EF%B8%8F-tech-stack)
 - [Getting Started](#-getting-started)
-  - [Prerequisites](#-prerequisites)
-  - [Backend Setup](#-backend-setup)
-  - [Frontend Setup](#-frontend-setup)
+  - [Prerequisites](#prerequisites)
+  - [Backend Setup](#backend-setup)
+  - [Frontend Setup](#frontend-setup)
 - [Environment Variables](#-environment-variables)
 - [Development Workflow](#-development-workflow)
 - [Team](#-team)
-- [Project Status](#-project-status)
 - [Contributing](#-contributing)
-- [Roadmap](#-roadmap)
 - [License](#-license)
-- [Documentation](#-documentation)
 - [Support](#-support)
-
----
-
-## 📚 Documentation
-
-For detailed technical specifications, please refer to our internal documentation:
-
-- **[📖 Agile Scrum Backlog](docs/scrum_backlog.md)** - Feature roadmap, sprint plans, and task assignments.
-- **[🏗️ System Architecture](docs/architecture.md)** - High-level design, context diagrams, and tech stack details.
-- **[🗄️ Database Schema](docs/database_schema.md)** - ER Diagrams, table definitions, and relationships.
-- **[🧪 Testing Strategy](docs/testing_strategy.md)** - QA protocols, testing tools, and coverage goals.
-- **[📡 API Documentation Hub](docs/api_documation.md)** - Central index for all API endpoints and specs.
 
 ---
 
@@ -65,6 +51,18 @@ This project is also built as a real-world backend-heavy portfolio project, foll
 - 💻 Self-learners tracking daily routines
 - 🧑‍💼 Individuals planning work, gym, sleep, and personal goals
 - 👨‍💻 Recruiters evaluating backend & full-stack skills
+---
+
+## 📚 Documentation
+
+For detailed technical specifications, please refer to our internal documentation:
+
+- **[📖 Agile Scrum Backlog](docs/scrum_backlog.md)** - Feature roadmap, sprint plans, and task assignments.
+- **[🏗️ System Architecture](docs/architecture.md)** - High-level design, context diagrams, and tech stack details.
+- **[🗄️ Database Schema](docs/database_schema.md)** - ER Diagrams, table definitions, and relationships.
+- **[🧪 Testing Strategy](docs/testing_strategy.md)** - QA protocols, testing tools, and coverage goals.
+- **[📡 API Documentation Hub](docs/api_documation.md)** - Central index for all API endpoints and specs.
+
 ---
 
 ## ✨ Core Features
@@ -348,7 +346,7 @@ Feel free to reach out through GitHub or LinkedIn.
 
 ---
 
-## 🤝 Collaboration & Workflow
+## 🤝 Contributing
 
 - Clear role ownership with cross-support
 - GitHub-based collaboration (issues, commits, pull requests)
