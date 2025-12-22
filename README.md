@@ -1,8 +1,9 @@
 # taskey
 
 <div align="center">
-  <h3>A Collaborative Full-Stack Task Management Platform</h3>
-  <p>Streamline your workflow, boost productivity, and achieve your goals</p>
+  <h3>Personal Productivity, Task Scheduling & Behavior Tracking Platform</h3>
+  <p><strong>Plan better. Build habits. Track progress.</strong></p>
+  <p>A full-stack productivity system designed for individuals who want structure, clarity, and consistency in daily life.</p>
 </div>
 
 ---
@@ -43,39 +44,85 @@ For detailed technical specifications, please refer to our internal documentatio
 
 ## 🎯 Overview
 
-**taskey** is a modern, full-stack task management and productivity tracking application designed to help individuals and teams organize their work efficiently. The platform combines intuitive task management with powerful analytics to provide insights into productivity patterns.
+**taskey** is a personal productivity and life-management platform that helps users:
 
 ### Key Capabilities
 
-- **Task Management:** Create, organize, and track tasks with ease
-- **Activity Tracking:** Monitor progress with date-based activity logs
-- **Smart Categorization:** Organize tasks by Work, Study, Personal, and custom categories
-- **Productivity Analytics:** Visualize your performance through interactive dashboards
-- **Collaborative Ready:** Built with team workflows in mind
+- plan daily and long-term tasks
+- schedule routines and recurring activities
+- track habits and behavior patterns
+- reflect on productivity and well-being
 
-This project serves as both a **functional productivity solution** and a **comprehensive learning resource** for aspiring full-stack developers, making it an ideal portfolio piece for internships and entry-level positions.
+Unlike generic to-do apps, Taskey focuses on **time-based planning**, **routine repetition**, and **behavior tracking**,making it ideal for **students**, **self-learners**, and **professionals** who want to improve consistency and discipline.
+
+This project is also built as a real-world backend-heavy portfolio project, following industry practices in authentication, database design, and API architecture.
 
 ---
 
-## ✨ Features
+## 🎯 Target Audience
 
-### Current Features
+- 🎓 Students managing study schedules & habits
+- 💻 Self-learners tracking daily routines
+- 🧑‍💼 Individuals planning work, gym, sleep, and personal goals
+- 👨‍💻 Recruiters evaluating backend & full-stack skills
+---
 
-- ✅ User authentication system (signup & login)
-- ✅ Full CRUD operations for tasks
-- ✅ Task categorization with custom labels
-- ✅ Activity status tracking
-- ✅ Date-based filtering and task history
-- ✅ RESTful API architecture
-- ✅ Responsive design
+## ✨ Core Features
 
-### Upcoming Features
+### 🔐 Authentication & Security
 
-- 🔄 Productivity dashboard with charts
-- 🔄 Real-time notifications
-- 🔄 Team collaboration tools
-- 🔄 Advanced filtering and search
-- 🔄 Task priority management
+- Email-based user registration
+- OTP verification for email confirmation
+- JWT-based authentication (stateless)
+- Secure logout & account deletion
+- Password reset via OTP
+
+### ✅ Task Management
+
+- Create, update, and delete tasks
+- Task priority (Low / Medium / High)
+- Task status tracking (Pending / Completed)
+- Optional due dates
+
+### 📆 Scheduling & Calendar System
+
+- Assign tasks to specific dates & time slot
+- Multiple schedules for the same task (e.g., gym morning & evening)
+- Recurring schedules:
+    - Daily routines
+    - Weekly (selected days like Mon/Wed/Fri)
+    - Monthly patterns
+- Designed for day / week / month calendar views
+
+### 🔁 Routine & Habit Tracking
+
+- Repeat tasks across multiple days
+- Support for long-term routines (e.g., 30-day habits)
+- Flexible recurrence rules
+
+### 🧠 Behavior & Productivity Tracking
+
+- Daily behavior logs
+- Mood tracking
+- Productivity score
+- Sleep & exercise indicators
+- Personal notes for reflection
+
+### 🌐 Public Pages
+
+- Home page
+- About Taskey
+- Privacy Policy
+- Terms & Conditions
+- Contact Us (stored in database)
+
+---
+
+### 🔄 Upcoming Features
+- Productivity dashboard with charts
+- AI-powered behavior analysis
+- AI-powered productivity suggestions
+- AI-powered habit tracking
 
 ---
 
@@ -131,8 +178,8 @@ taskey/
 
 ### Database
 
-- **PostgreSQL** or **MongoDB** (Implementation in progress)
-- **Sequelize/Mongoose** for ORM/ODM
+- **PostgreSQL** database
+- **Prisma** ORM
 
 ### Development Tools
 
@@ -214,74 +261,18 @@ Create a `.env` file in the **backend** directory with the following variables:
 ```
 # Server Configuration
 PORT=5000
-NODE_ENV=development
 
-# Database (to be configured)
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=taskey_db
-DB_USER=your_username
-DB_PASSWORD=your_password
+# JWT Configuration
+JWT_SECRET=super_secret_key
+JWT_EXPIRES_IN=7d
+OTP_EXPIRES_MINUTES=10
 
-# JWT Configuration (to be added)
-JWT_SECRET=your_jwt_secret_key
-JWT_EXPIRE=7d
-
-# CORS Configuration
-CORS_ORIGIN=http://localhost:3000
+# Supabase Configuration
+DATABASE_URL=postgresql://USER:PASSWORD@db.xxxxx.supabase.co:5432/postgres?sslmode=require
 ```
 
 
 > **Note:** Never commit your `.env` file to version control. It's already included in `.gitignore`.
-
----
-
-## 🔄 Development Workflow
-
-### Architecture
-
-- **Frontend and backend** are developed as separate, independent services
-- **RESTful APIs** expose backend functionality to the frontend
-- **JSON** is used for data exchange between client and server
-
-### Git Workflow
-
-1. Create a new branch for each feature:
-```
-git checkout -b feature/task-categories
-```
-
-
-2. Make your changes and commit regularly:
-```
-git add .
-git commit -m "Add: task category filtering"
-```
-
-
-3. Push your branch:
-```
-git push origin feature/task-categories
-```
-
-
-4. Open a Pull Request for review
-
-### Branch Naming Convention
-
-- `feature/feature-name` - New features
-- `bugfix/issue-description` - Bug fixes
-- `hotfix/critical-fix` - Urgent production fixes
-- `docs/update-description` - Documentation updates
-
-### Commit Message Format
-
-- Brief description
-- More detailed explanation if needed
-- Use bullet points for multiple changes
-
-
-**Types:** Add, Update, Fix, Remove, Refactor, Docs, Style, Test
 
 ---
 
@@ -346,16 +337,7 @@ Tasky is a collaborative, real-world project developed by a small team of studen
 
 ---
 
-### 🤝 Collaboration & Workflow
-
-- Clear role ownership with cross-support
-- GitHub-based collaboration (issues, commits, pull requests)
-- Focus on clean code, learning, and maintainability
-- Designed as a **portfolio-ready project** for internships & junior developer roles
-
----
-
-### 🚀 Open for Opportunities
+## 🚀 Open for Opportunities
 
 We are open to:
 - Internship & entry-level roles  
@@ -363,6 +345,30 @@ We are open to:
 - Feedback, reviews, and mentorship  
 
 Feel free to reach out through GitHub or LinkedIn.
+
+---
+
+## 🤝 Collaboration & Workflow
+
+- Clear role ownership with cross-support
+- GitHub-based collaboration (issues, commits, pull requests)
+- Focus on clean code, learning, and maintainability
+
+### Branch Naming Convention
+
+- `feature/feature-name` - New features
+- `bugfix/issue-description` - Bug fixes
+- `hotfix/critical-fix` - Urgent production fixes
+- `docs/update-description` - Documentation updates
+
+### Commit Message Format
+
+- Brief description
+- More detailed explanation if needed
+- Use bullet points for multiple changes
+
+
+**Types:** Add, Update, Fix, Remove, Refactor, Docs, Style, Test
 
 ---
 
@@ -423,41 +429,6 @@ Found a bug or have a suggestion? [Open an issue](https://github.com/sh1vam/task
 
 ---
 
-## 🗺️ Roadmap
-
-### Phase 1: Foundation (Current)
-- ✅ Project setup and initialization
-- 🔄 User authentication and authorization
-- 🔄 Core task CRUD operations
-- 🔄 Basic activity tracking
-
-### Phase 2: Enhanced Features
-- ⏳ Database integration (PostgreSQL/MongoDB)
-- ⏳ Advanced task filtering and search
-- ⏳ Task priority and deadline management
-- ⏳ User profile management
-
-### Phase 3: Analytics & Insights
-- ⏳ Productivity dashboard with visualizations
-- ⏳ Weekly/monthly reports
-- ⏳ Goal tracking and progress monitoring
-- ⏳ Performance analytics
-
-### Phase 4: Collaboration
-- ⏳ Team workspaces
-- ⏳ Task assignment and sharing
-- ⏳ Real-time notifications
-- ⏳ Activity feed
-
-### Phase 5: Production Ready
-- ⏳ Comprehensive testing suite
-- ⏳ Performance optimization
-- ⏳ Security hardening
-- ⏳ Deployment documentation
-- ⏳ CI/CD pipeline setup
-
----
-
 ## 📄 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
@@ -507,9 +478,9 @@ Special thanks to:
 <br>
 
 <p>
- <a href="https://github.com/atharvkundalkar">Developer 1</a> •
- <a href="https://github.com/sh1vam-03">Developer 2</a> •
- <a href="https://github.com/Dinesh-more99">Developer 3</a>
+ <a href="https://github.com/atharvkundalkar">Atharv Kundalkar</a> •
+ <a href="https://github.com/sh1vam-03">Balaji Bokare</a> •
+ <a href="https://github.com/Dinesh-more99">Dinesh More</a>
 </p>
 
 <br>
@@ -518,3 +489,5 @@ Special thanks to:
  <a href="#taskey">Back to Top ↑</a>
 </p>
 </div>
+
+---
