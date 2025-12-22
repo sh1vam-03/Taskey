@@ -228,23 +228,74 @@ taskey/
 
 ## 🛠️ Tech Stack
 
-### Frontend
-
-| Technology | Purpose |
-|------------|---------|
-| **Next.js** | React framework for production |
-| **Tailwind CSS** | Utility-first CSS framework |
-| **HTML5/CSS3** | Core web technologies |
-| **Axios** | HTTP client for API requests |
-
-### Backend
-
-| Technology | Purpose |
-|------------|---------|
-| **Node.js** | JavaScript runtime environment |
-| **Express.js** | Web application framework |
-| **JWT** | Authentication and authorization |
-| **bcrypt** | Password hashing |
+<table>
+  <thead>
+    <tr>
+      <th>Frontend</th>
+      <th>Backend</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+      <table>
+  <thead>
+    <tr>
+      <th>Technology</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Next.js</td>
+      <td>React framework for production</td>
+    </tr>
+    <tr>
+      <td>Tailwind CSS</td>
+      <td>Utility-first CSS framework</td>
+    </tr>
+    <tr>
+      <td>HTML5/CSS3</td>
+      <td>Core web technologies</td>
+    </tr>
+    <tr>
+      <td>Axios</td>
+      <td>HTTP client for API requests</td>
+    </tr>
+  </tbody>
+</table>
+      </td>
+      <td>
+      <table>
+  <thead>
+    <tr>
+      <th>Technology</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Node.js</td>
+      <td>JavaScript runtime environment</td>
+    </tr>
+    <tr>
+      <td>Express.js</td>
+      <td>Web application framework</td>
+    </tr>
+    <tr>
+      <td>JWT</td>
+      <td>Authentication and authorization</td>
+    </tr>
+    <tr>
+      <td>bcrypt</td>
+      <td>Password hashing</td>
+    </tr>
+  </tbody>
+</table>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### Database
 
