@@ -20,7 +20,6 @@
   - [Backend Setup](#backend-setup)
   - [Frontend Setup](#frontend-setup)
 - [Environment Variables](#-environment-variables)
-- [Development Workflow](#-development-workflow)
 - [Team](#-team)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -137,14 +136,14 @@ taskey/
 │
 ├── backend/ # Node.js + Express backend API
 │ ├── controllers/ # Request handlers
-│ ├── models/ # Database models
+│ ├── services/ # Business logic
 │ ├── routes/ # API route definitions
 │ ├── middleware/ # Custom middleware
 │ └── config/ # Configuration files
 │
 ├── docs/ # Documentation and specifications
 │ ├── api/ # API documentation
-│ └── architecture/ # System architecture docs
+│ └── ... # System architecture docs
 │
 ├── .gitignore # Git ignore rules
 ├── LICENSE # MIT License
@@ -199,6 +198,8 @@ Before you begin, ensure you have the following installed:
 - **Git** (v2.30.0 or higher)
 - **Code Editor** (VS Code recommended)
 
+---
+
 ### Backend Setup
 
 1. Navigate to the backend directory:
@@ -213,7 +214,7 @@ npm install
 ```
 
 
-3. Create a `.env` file (see [Environment Variables](#environment-variables))
+3. Create a `.env` file (see [Environment Variables](#-environment-variables))
 
 4. Start the development server:
 ```
@@ -224,6 +225,8 @@ npm run dev
 5. Verify the server is running:
 - Server URL: `http://localhost:5000`
 - Health check: `GET http://localhost:5000/api/health`
+
+---
 
 ### Frontend Setup
 
