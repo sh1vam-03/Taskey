@@ -157,18 +157,37 @@ Re-sends the verification code if the previous one expired.
 
 Invalidates the user session. The client should also delete the stored JWT.
 
-### Request Body
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `userId` | number | **Yes** | ID of the user logging out |
+### Headers
+| Key | Value | Required | Description |
+|-----|-------|----------|-------------|
+| `Authorization` | `Bearer <token>` | **Yes** | JWT access token |
 
 ### Success Response (200 OK)
 ```json
 {
   "success": true,
-  "message": "Logout successfully",
+  "message": "Logout successful"
+}
+```
+
+---
+
+## 6. Delete Account
+**Endpoint:** `DELETE /me`
+
+Permanently deletes the authenticated user's account and all associated data. This action is irreversible.
+
+### Headers
+| Key | Value | Required | Description |
+|-----|-------|----------|-------------|
+| `Authorization` | `Bearer <token>` | **Yes** | JWT access token |
+
+### Success Response (200 OK)
+```json
+{
+  "success": true,
   "data": {
-    "email": "user@example.com"
+    "message": "Account deleted successfully"
   }
 }
 ```
