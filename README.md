@@ -12,16 +12,16 @@
 
 - [Overview](#-overview)
 - [Documentation](#-documentation)
+- [Team](#-team)
 - [Core Features](#-core-features)
 - [Project Structure](#-project-structure)
 - [Tech Stack](#%EF%B8%8F-tech-stack)
+- [Contributing](#-contributing)
 - [Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
   - [Backend Setup](#backend-setup)
   - [Frontend Setup](#frontend-setup)
 - [Environment Variables](#-environment-variables)
-- [Team](#-team)
-- [Contributing](#-contributing)
 - [License](#-license)
 - [Support](#-support)
 
@@ -61,6 +61,79 @@ For detailed technical specifications, please refer to our internal documentatio
 - **[🗄️ Database Schema](docs/database_schema.md)** - ER Diagrams, table definitions, and relationships.
 - **[🧪 Testing Strategy](docs/testing_strategy.md)** - QA protocols, testing tools, and coverage goals.
 - **[📡 API Documentation Hub](docs/api_documation.md)** - Central index for all API endpoints and specs.
+
+---
+
+## 👥 Team
+
+Tasky is a collaborative, real-world project developed by a small team of student developers. The focus is on **clean backend architecture, practical frontend development, API design, testing, and documentation**, aligned with internship and entry-level industry expectations.
+
+---
+
+<table align="center">
+  <tr>
+    <!-- Atharv -->
+    <td align="center" width="33%">
+      <img src="https://github.com/atharvkundalkar.png" width="110" alt="Atharv Kundalkar" /><br /><br />
+      <strong>Atharv Kundalkar</strong><br />
+      <sub>Frontend Developer</sub><br /><br />
+      <div align="left">
+        • UI / UX Implementation<br />
+        • Reusable Component Design<br />
+        • Responsive Layouts<br />
+        • Frontend API Integration
+      </div><br />
+      <a href="https://github.com/atharvkundalkar">GitHub</a> |
+      <a href="https://linkedin.com/in/atharv-kundalkar-52467028b">LinkedIn</a> |
+      <a href="https://instagram.com/atharvkundalkar_47">Instagram</a><br />
+      <sub>📧 atharvkundalkar1@gmail.com</sub>
+    </td>
+    <!-- Balaji -->
+    <td align="center" width="33%">
+      <img src="https://github.com/sh1vam-03.png" width="110" alt="Balaji Bokare" /><br /><br />
+      <strong>Balaji Bokare</strong><br />
+      <sub>Backend Developer</sub><br /><br />
+      <div align="left">
+        • REST API Development<br />
+        • Authentication & Security<br />
+        • Database Design & Queries<br />
+        • Testing, Debugging & Documentation
+      </div><br />
+      <a href="https://github.com/sh1vam-03">GitHub</a> |
+      <a href="https://linkedin.com/in/sh1vam~03">LinkedIn</a> |
+      <a href="https://instagram.com/sh1vam_03">Instagram</a><br />
+      <sub>📧 l1acker03@gmail.com</sub>
+    </td>
+    <!-- Dinesh -->
+    <td align="center" width="33%">
+      <img src="https://github.com/Dinesh-more99.png" width="110" alt="Dinesh More" /><br /><br />
+      <strong>Dinesh More</strong><br />
+      <sub>Frontend Developer</sub><br /><br />
+      <div align="left">
+        • UI Development & Styling<br />
+        • Frontend–Backend Coordination<br />
+        • UI Testing & Bug Fixes<br />
+        • Layout & Usability Improvements
+      </div><br />
+      <a href="https://github.com/Dinesh-more99">GitHub</a> |
+      <a href="https://linkedin.com/in/dinesh~more">LinkedIn</a> |
+      <a href="https://instagram.com/dineshmore5523">Instagram</a><br />
+      <sub>📧 dineshmore9970@gmail.com</sub>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 🚀 Open for Opportunities
+
+We are open to:
+- Internship & entry-level roles  
+- Open-source collaboration  
+- Feedback, reviews, and mentorship  
+
+Feel free to reach out through GitHub or LinkedIn.
+
 
 ---
 
@@ -187,6 +260,87 @@ taskey/
 
 ---
 
+## 🤝 Contributing
+
+- Clear role ownership with cross-support
+- GitHub-based collaboration (issues, commits, pull requests)
+- Focus on clean code, learning, and maintainability
+
+### Branch Naming Convention
+
+- `feature/feature-name` - New features
+- `bugfix/issue-description` - Bug fixes
+- `hotfix/critical-fix` - Urgent production fixes
+- `docs/update-description` - Documentation updates
+
+### Commit Message Format
+
+- Brief description
+- More detailed explanation if needed
+- Use bullet points for multiple changes
+
+
+**Types:** Add, Update, Fix, Remove, Refactor, Docs, Style, Test
+
+---
+
+### How to Contribute
+
+1. **Fork the repository**
+   - Click the "Fork" button at the top right of this page
+
+2. **Clone your fork**
+```
+git clone https://github.com/your-username/taskey.git
+cd taskey
+```
+
+
+3. **Create a feature branch**
+```
+git checkout -b feature/amazing-feature
+```
+
+
+4. **Make your changes**
+- Write clean, readable code
+- Follow the existing code style
+- Add comments where necessary
+
+5. **Commit your changes**
+```
+git commit -m "Add: amazing feature description"
+```
+
+
+6. **Push to your branch**
+```
+git push origin feature/amazing-feature
+```
+
+
+7. **Open a Pull Request**
+- Provide a clear description of your changes
+- Link any related issues
+
+### Code Style Guidelines
+
+- Use meaningful variable and function names
+- Keep functions small and focused
+- Write self-documenting code
+- Add comments for complex logic
+- Follow ESLint rules
+
+### Reporting Issues
+
+Found a bug or have a suggestion? [Open an issue](https://github.com/sh1vam/taskey/issues) with:
+- Clear title and description
+- Steps to reproduce (for bugs)
+- Expected vs actual behavior
+- Screenshots if applicable
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -274,159 +428,6 @@ DATABASE_URL=postgresql://USER:PASSWORD@db.xxxxx.supabase.co:5432/postgres?sslmo
 
 
 > **Note:** Never commit your `.env` file to version control. It's already included in `.gitignore`.
-
----
-
-## 👥 Team
-
-Tasky is a collaborative, real-world project developed by a small team of student developers. The focus is on **clean backend architecture, practical frontend development, API design, testing, and documentation**, aligned with internship and entry-level industry expectations.
-
----
-
-<table align="center">
-  <tr>
-    <!-- Atharv -->
-    <td align="center" width="33%">
-      <img src="https://github.com/atharvkundalkar.png" width="110" alt="Atharv Kundalkar" /><br /><br />
-      <strong>Atharv Kundalkar</strong><br />
-      <sub>Frontend Developer</sub><br /><br />
-      <div align="left">
-        • UI / UX Implementation<br />
-        • Reusable Component Design<br />
-        • Responsive Layouts<br />
-        • Frontend API Integration
-      </div><br />
-      <a href="https://github.com/atharvkundalkar">GitHub</a> |
-      <a href="https://linkedin.com/in/atharv-kundalkar-52467028b">LinkedIn</a> |
-      <a href="https://instagram.com/atharvkundalkar_47">Instagram</a><br />
-      <sub>📧 atharvkundalkar1@gmail.com</sub>
-    </td>
-    <!-- Balaji -->
-    <td align="center" width="33%">
-      <img src="https://github.com/sh1vam-03.png" width="110" alt="Balaji Bokare" /><br /><br />
-      <strong>Balaji Bokare</strong><br />
-      <sub>Backend Developer</sub><br /><br />
-      <div align="left">
-        • REST API Development<br />
-        • Authentication & Security<br />
-        • Database Design & Queries<br />
-        • Testing, Debugging & Documentation
-      </div><br />
-      <a href="https://github.com/sh1vam-03">GitHub</a> |
-      <a href="https://linkedin.com/in/sh1vam~03">LinkedIn</a> |
-      <a href="https://instagram.com/sh1vam_03">Instagram</a><br />
-      <sub>📧 l1acker03@gmail.com</sub>
-    </td>
-    <!-- Dinesh -->
-    <td align="center" width="33%">
-      <img src="https://github.com/Dinesh-more99.png" width="110" alt="Dinesh More" /><br /><br />
-      <strong>Dinesh More</strong><br />
-      <sub>Frontend Developer</sub><br /><br />
-      <div align="left">
-        • UI Development & Styling<br />
-        • Frontend–Backend Coordination<br />
-        • UI Testing & Bug Fixes<br />
-        • Layout & Usability Improvements
-      </div><br />
-      <a href="https://github.com/Dinesh-more99">GitHub</a> |
-      <a href="https://linkedin.com/in/dinesh~more">LinkedIn</a> |
-      <a href="https://instagram.com/dineshmore5523">Instagram</a><br />
-      <sub>📧 dineshmore9970@gmail.com</sub>
-    </td>
-  </tr>
-</table>
-
----
-
-## 🚀 Open for Opportunities
-
-We are open to:
-- Internship & entry-level roles  
-- Open-source collaboration  
-- Feedback, reviews, and mentorship  
-
-Feel free to reach out through GitHub or LinkedIn.
-
----
-
-## 🤝 Contributing
-
-- Clear role ownership with cross-support
-- GitHub-based collaboration (issues, commits, pull requests)
-- Focus on clean code, learning, and maintainability
-
-### Branch Naming Convention
-
-- `feature/feature-name` - New features
-- `bugfix/issue-description` - Bug fixes
-- `hotfix/critical-fix` - Urgent production fixes
-- `docs/update-description` - Documentation updates
-
-### Commit Message Format
-
-- Brief description
-- More detailed explanation if needed
-- Use bullet points for multiple changes
-
-
-**Types:** Add, Update, Fix, Remove, Refactor, Docs, Style, Test
-
----
-
-### How to Contribute
-
-1. **Fork the repository**
-   - Click the "Fork" button at the top right of this page
-
-2. **Clone your fork**
-```
-git clone https://github.com/your-username/taskey.git
-cd taskey
-```
-
-
-3. **Create a feature branch**
-```
-git checkout -b feature/amazing-feature
-```
-
-
-4. **Make your changes**
-- Write clean, readable code
-- Follow the existing code style
-- Add comments where necessary
-
-5. **Commit your changes**
-```
-git commit -m "Add: amazing feature description"
-```
-
-
-6. **Push to your branch**
-```
-git push origin feature/amazing-feature
-```
-
-
-7. **Open a Pull Request**
-- Provide a clear description of your changes
-- Link any related issues
-
-### Code Style Guidelines
-
-- Use meaningful variable and function names
-- Keep functions small and focused
-- Write self-documenting code
-- Add comments for complex logic
-- Follow ESLint rules
-
-### Reporting Issues
-
-Found a bug or have a suggestion? [Open an issue](https://github.com/sh1vam/taskey/issues) with:
-- Clear title and description
-- Steps to reproduce (for bugs)
-- Expected vs actual behavior
-- Screenshots if applicable
 
 ---
 
