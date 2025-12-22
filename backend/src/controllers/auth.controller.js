@@ -194,7 +194,7 @@ export const logout = (req, res) => {
  */
 
 export const deleteMyAccount = asyncHandler(async (req, res) => {
-    const userId = req.user.id; //From JWT
+    const userId = req.user.userId; //From JWT
 
     // Input Validation
     if (!userId) {
