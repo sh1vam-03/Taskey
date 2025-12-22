@@ -191,3 +191,31 @@ Permanently deletes the authenticated user's account and all associated data. Th
   }
 }
 ```
+
+---
+
+## 7. Get User Profile
+**Endpoint:** `GET /me`
+
+Retrieves the profile information of the currently authenticated user.
+
+### Headers
+| Key | Value | Required | Description |
+|-----|-------|----------|-------------|
+| `Authorization` | `Bearer <token>` | **Yes** | JWT access token |
+
+### Success Response (200 OK)
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "isEmailVerified": true,
+    "createdAt": "2023-10-27T10:00:00.000Z",
+    "updatedAt": "2023-10-27T10:00:00.000Z"
+  }
+}
+```
+
