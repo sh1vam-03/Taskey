@@ -347,3 +347,27 @@ export const deleteMyAccount = async (userId) => {
 
     return { message: "Account deleted successfully" };
 }
+
+
+export const getMyProfile = async (userId) => {
+    // Find user by id
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userId
+        },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            isEmailVerified: true,
+            createdAt: true,
+            updatedAt: true,
+        }
+    });
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    return user;
+}

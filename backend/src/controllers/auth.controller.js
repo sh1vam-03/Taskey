@@ -212,3 +212,28 @@ export const deleteMyAccount = asyncHandler(async (req, res) => {
         },
     });
 });
+
+
+/**
+ * @route GET /api/auth/me
+ * @desc Get user profile
+ * @access Private
+ */
+
+export const getMyProfile = asyncHandler(async (req, res) => {
+    const userId = req.user.userId; //From JWT
+
+    // Input Validation
+    if (!userId) {
+        throw new ApiError(400, "Please provide user ID");
+    }
+
+    // Call Service
+    const profile = await authService.getMyProfile(userId);
+
+    // Send Response
+    return res.status(200).json({
+        success: true,
+        data: profile,
+    });
+});
