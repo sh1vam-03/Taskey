@@ -1,13 +1,7 @@
 import express from "express";
-
+import healthController from "../controllers/health.controller";
 const router = express.Router();
 
-router.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    message: "API is healthy",
-    time: new Date().toISOString()
-  });
-});
+router.get("/health", healthController.healthCheck);
 
 export default router;
