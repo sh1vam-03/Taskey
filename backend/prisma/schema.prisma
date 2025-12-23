@@ -17,11 +17,6 @@ enum TaskPriority {
   HIGH
 }
 
-enum TaskStatus {
-  PENDING
-  COMPLETED
-}
-
 enum Mood {
   HAPPY
   NEUTRAL
@@ -50,14 +45,17 @@ model User {
   email           String  @unique
   password        String
   isEmailVerified Boolean @default(false)
+  timezone        String? // e.g. "Asia/Kolkata"
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tasks     Task[]
-  schedules Schedule[]
-  behaviors BehaviorLog[]
-  otps      Otp[]
+  tasks           Task[]
+  schedules       Schedule[]
+  behaviors       BehaviorLog[]
+  otps            Otp[]
+  taskCompletions TaskCompletion[]
+  categories      Category[]
 }
 
 //============================
@@ -88,16 +86,61 @@ model Task {
   title       String
   description String?
   priority    TaskPriority @default(MEDIUM)
-  status      TaskStatus   @default(PENDING)
   dueDate     DateTime?
+  order       Int?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // Category relation
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  schedules Schedule[]
+  schedules   Schedule[]
+  completions TaskCompletion[]
+
+  isArchived Boolean   @default(false)
+  deletedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([categoryId])
+}
+
+model Category {
+  id    String  @id @default(uuid())
+  name  String
+  color String? // optional (UI use)
+  icon  String? // optional
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name]) // user cannot have duplicate category names
+  @@index([userId])
+}
+
+model TaskCompletion {
+  id            String   @id @default(uuid())
+  completedDate DateTime @db.Date
+  completedAt   DateTime @default(now())
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, completedDate])
+  @@index([userId, completedDate])
+  @@index([taskId])
 }
 
 //============================
@@ -105,7 +148,8 @@ model Task {
 //============================
 
 model Schedule {
-  id String @id @default(uuid())
+  id    String  @id @default(uuid())
+  notes String?
 
   scheduleDate DateTime @db.Date
   startTime    DateTime @db.Time
@@ -124,6 +168,7 @@ model Schedule {
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@index([userId, scheduleDate])
+  @@index([taskId])
 }
 
 //============================
