@@ -16,7 +16,7 @@ The API is designed around **RESTful** principles and uses standard **HTTP statu
 | **🌐 Public API** | System Health Checks and Contact Forms. Accessible without auth. | [View Public API](./api/public_api.md) |
 | **🔐 Authentication** | Signup, Login, Password Reset, and User Profile. | [View Auth API](./api/auth_api.md) |
 | **📝 Task Management** | CRUD operations for Tasks. | [View Task API](./api/task_api.md) |
-
+| **📂 Category Management** | CRUD operations for Task Categories. | [View Category API](./api/category_api.md) |
 ---
 
 ## ⚠️ Common Standards
