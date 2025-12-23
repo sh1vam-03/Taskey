@@ -6,5 +6,7 @@ const router = express.Router();
 
 router.post("/:id/complete", authMiddleware, taskCompletionController.completeTask);
 router.delete("/:id/completed", authMiddleware, taskCompletionController.undoTaskCompletion);
+router.get("/:id/completed-history", authMiddleware, taskCompletionController.getTaskCompletion);
+router.post("/complete-bulk", authMiddleware, taskCompletionController.completeBulkTasks);
 
 export default router;

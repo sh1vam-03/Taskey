@@ -1,5 +1,5 @@
 import asyncHandler from "../utils/asyncHandler.js";
-import taskCompletionService from "../services/taskCompletion.service.js";
+import * as     taskCompletionService from "../services/taskCompletion.service.js";
 
 
 /**
@@ -14,7 +14,7 @@ export const completeTask = asyncHandler(async (req, res) => {
     const { date } = req.body;
 
     // Input Validation
-    const task = await taskService.completeTask(userId, id, date);
+    const task = await taskCompletionService.completeTask(userId, id, date);
 
     res.status(200).json({
         success: true,
@@ -35,10 +35,50 @@ export const undoTaskCompletion = asyncHandler(async (req, res) => {
     const { date } = req.body;
 
     // Input Validation
-    await taskService.undoTaskCompletion(userId, id, date);
+    await taskCompletionService.undoTaskCompletion(userId, id, date);
 
     res.status(200).json({
         success: true,
         message: "Task completion undone successfully"
+    });
+});
+
+
+/**
+ * @route   GET /api/tasks/:id/completed-history
+ * @desc    Get a task completion history
+ * @access  Private
+ */
+
+export const getTaskCompletion = asyncHandler(async (req, res) => {
+    const userId = req.user.userId; //From JWT
+    const { id: taskId } = req.params;
+
+    const completion = await taskCompletionService.getTaskCompletion(userId, taskId);
+
+    res.status(200).json({
+        success: true,
+        message: "Task completion retrieved successfully",
+        data: completion
+    });
+});
+
+/**
+ * @route   POST /api/tasks/complete-bulk
+ * @desc    Complete multiple tasks
+ * @access  Private
+ */
+
+export const completeBulkTasks = asyncHandler(async (req, res) => {
+    const userId = req.user.userId; //From JWT
+    const { taskIds, date } = req.body;
+
+    // Input Validation
+    const result = await taskCompletionService.completeBulkTasks(userId, taskIds, date);
+
+    res.status(200).json({
+        success: true,
+        message: "Bulk tasks completed successfully",
+        data: result
     });
 });

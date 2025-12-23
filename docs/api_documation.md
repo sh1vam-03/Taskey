@@ -17,6 +17,7 @@ The API is designed around **RESTful** principles and uses standard **HTTP statu
 | **🔐 Authentication** | Signup, Login, Password Reset, and User Profile. | [View Auth API](./api/auth_api.md) |
 | **📝 Task Management** | CRUD operations for Tasks. | [View Task API](./api/task_api.md) |
 | **📂 Category Management** | CRUD operations for Task Categories. | [View Category API](./api/category_api.md) |
+| **✅ Task Completion** | Mark tasks as Done/Undone, History, Bulk actions. | [View Completion API](./api/task_completion_api.md) |
 ---
 
 ## ⚠️ Common Standards
