@@ -342,7 +342,7 @@ taskey/
 
 2. **Clone your fork**
 ```
-git clone https://github.com/your-username/taskey.git
+git clone https://github.com/sh1vam-03/taskey.git
 cd taskey
 ```
 
