@@ -28,19 +28,19 @@ export const createSchedule = asyncHandler(async (req, res) => {
             throw new ApiError(400, "repeatUntil is not required for one time task");
         }
 
-        if (repeatOnDays && repeatOnDays.length > 0) {
+        if (repeatOnDays?.length) {
             throw new ApiError(400, "repeatOnDays is not required for one time task");
         }
     }
 
     // Validation check for daily task schedule
     if (recurrence === "DAILY") {
-        if (repeatUntil) {
-            throw new ApiError(400, "repeatUntil is not required for daily task");
+        if (!repeatUntil) {
+            throw new ApiError(400, "repeatUntil is required for daily task");
         }
 
-        if (repeatOnDays || repeatOnDays.length > 0) {
-            throw new ApiError(400, "repeatOnDays is not required for daily task");
+        if (repeatOnDays?.length) {
+            throw new ApiError(400, "repeatOnDays is required for daily task");
         }
     }
 
