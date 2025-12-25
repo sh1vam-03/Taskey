@@ -201,6 +201,11 @@ export const updateSchedule = async (userId, scheduleId, data) => {
             scheduleDate: new Date(scheduleDate),
             NOT: {
                 id: scheduleId
+            },
+        },
+        include: {
+            task: {
+                select: { title: true }
             }
         }
     });
@@ -208,7 +213,7 @@ export const updateSchedule = async (userId, scheduleId, data) => {
     for (const schedule of existingSchedule) {
         if (hasTimeConflict(schedule, normalizeStartTime, normalizeEndTime)) {
             throw new ApiError(409,
-                `Schedule conflict with existing "${task.title}" - (${schedule.startTime} - ${schedule.endTime})`);
+                `Schedule conflict with existing "${schedule.task.title}" - (${schedule.startTime} - ${schedule.endTime})`);
         }
     }
 
