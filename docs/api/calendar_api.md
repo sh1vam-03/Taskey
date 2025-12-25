@@ -9,7 +9,7 @@ This module provides endpoints to retrieve task schedules and completion status 
 ## 1. Get Day View
 **Endpoint:** `GET /day`
 
-Retrieves the schedule and task status for a specific day. Tasks are classified into scheduled, completed, pending, and missed.
+Retrieves the schedule and task status for a specific day.
 
 ### Headers
 | Key | Value | Required | Description |
@@ -28,23 +28,30 @@ Retrieves the schedule and task status for a specific day. Tasks are classified 
   "message": "Calendar day data fetched successfully",
   "data": {
     "date": "2023-12-25",
-    "scheduledTasks": [
+    "schedules": [
       {
         "scheduleId": 1,
         "taskId": "uuid-1",
         "title": "Morning Standup",
         "priority": "HIGH",
-        "startTime": "09:00:00",
-        "endTime": "09:30:00",
-        "completedAt": "2023-12-25T09:30:00.000Z"
+        "startTime": "09:00",
+        "endTime": "09:30",
+        "status": "COMPLETED" 
+      },
+      {
+        "scheduleId": 2,
+        "taskId": "uuid-2",
+        "title": "Client Meeting",
+        "priority": "MEDIUM",
+        "startTime": "14:00",
+        "endTime": "15:00",
+        "status": "PENDING"
       }
-    ],
-    "completedTasks": [ ... ],
-    "pendingTasks": [ ... ],
-    "missedTasks": [ ... ]
+    ]
   }
 }
 ```
+*Status values*: `PENDING`, `COMPLETED`, `MISSED`
 
 ---
 
@@ -71,17 +78,26 @@ Retrieves the schedule for a full week surrounding the given date.
   "data": {
     "weekStart": "2023-12-25",
     "weekEnd": "2023-12-31",
-    "days": {
-      "2023-12-25": {
+    "days": [
+      {
         "date": "2023-12-25",
-        "scheduledTasks": [ ... ],
-        "completedTasks": [ ... ],
-        "pendingTasks": [ ... ],
-        "missedTasks": [ ... ]
+        "schedules": [
+          {
+            "scheduleId": 1,
+            "title": "Task 1",
+            "startTime": "09:00",
+            "endTime": "10:00",
+            "status": "COMPLETED"
+            // ... other fields
+          }
+        ]
       },
-      "2023-12-26": { ... }
+      {
+        "date": "2023-12-26",
+        "schedules": []
+      }
       // ... rest of the week
-    }
+    ]
   }
 }
 ```
@@ -113,9 +129,16 @@ Retrieves the schedule for a specific month.
     "month": "2023-12",
     "days": {
       "2023-12-01": {
-        "scheduledTasks": [ ... ],
-        "completedTasks": [ ... ],
-        // ...
+        "date": "2023-12-01",
+        "schedules": [
+           {
+             "scheduleId": 10,
+             "title": "Monthly Review",
+             "startTime": "10:00",
+             "endTime": "11:00",
+             "status": "PENDING"
+           }
+        ]
       },
       // ... rest of the month
     }
