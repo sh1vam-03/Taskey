@@ -88,3 +88,28 @@ export const createSchedule = asyncHandler(async (req, res) => {
         data: schedule
     });
 });
+
+/**
+ * @route GET /api/schedules
+ * @desc Get All Schedules and Task Schedules
+ * @access Private
+ */
+
+export const getSchedules = asyncHandler(async (req, res) => {
+    const userId = req.user.userId;
+    const { from, to, taskId } = req.query;
+
+    if (from || to) {
+        if (from > to) {
+            throw new ApiError(400, "from must be less than to");
+        }
+    }
+
+    const schedules = await scheduleService.getSchedules(userId, from, to, taskId);
+
+    res.status(200).json({
+        success: true,
+        message: "Schedules retrieved successfully",
+        data: schedules
+    });
+});

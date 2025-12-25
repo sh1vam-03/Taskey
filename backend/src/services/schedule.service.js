@@ -72,3 +72,54 @@ export const createSchedule = async (data) => {
     });
     return schedule;
 };
+
+// Get All Schedules and Task Schedules
+export const getSchedules = async (userId, from, to, taskId) => {
+
+    const where = {
+        userId,
+    };
+
+    if (taskId) {
+        where.taskId = taskId;
+    }
+
+    if (from && to) {
+        where.scheduleDate = {};
+        if (from) {
+            where.scheduleDate.gte = new Date(from);
+        }
+        if (to) {
+            where.scheduleDate.lte = new Date(to);
+        }
+    }
+
+    const schedules = await prisma.schedule.findMany({
+        where,
+        include: {
+            task: {
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    priority: true,
+                    category: {
+                        select: {
+                            id: true,
+                            name: true,
+                            color: true
+                        }
+                    }
+                }
+            }
+        }, orderBy: [
+            {
+                scheduleDate: "asc"
+            },
+            {
+                startTime: "asc"
+            }
+        ]
+    });
+    return schedules;
+};
