@@ -4,7 +4,7 @@ import * as scheduleController from "../controllers/schedule.controller.js";
 
 const router = express.Router();
 
-// router.post("/", authMiddleware, scheduleController.createSchedule);
+router.post("/", authMiddleware, scheduleController.createSchedule);
 
 
 export default router;
