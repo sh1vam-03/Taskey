@@ -26,8 +26,16 @@ export const createSchedule = async (data) => {
         throw new ApiError(404, "Task not found");
     }
 
+    // Normalize time
+    const normalizeStartTime = new Date(`1970-01-01T${startTime}:00`);
+    const normalizeEndTime = new Date(`1970-01-01T${endTime}:00`);
+
+    if (isNaN(normalizeStartTime.getTime()) || isNaN(normalizeEndTime.getTime())) {
+        throw new ApiError(400, "Invalid startTime or endTime format (HH:mm required)");
+    }
+
     // Validate time
-    if (startTime >= endTime) {
+    if (normalizeStartTime >= normalizeEndTime) {
         throw new ApiError(400, "End time must be greater than start time");
     }
 
@@ -35,37 +43,57 @@ export const createSchedule = async (data) => {
     const normalizeRepeatUntil = repeatUntil ? new Date(`${repeatUntil}T23:59:59`) : null;
 
 
-    console.log({
-        recurrence,
-        repeatUntil,
-        normalizeRepeatUntil
+    // Check for time conflicts
+    const existingSchedule = await prisma.schedule.findMany({
+        where: {
+            userId,
+            scheduleDate: new Date(scheduleDate)
+        }
     });
 
-
-    // Recurrence Validation
-    if (recurrence !== "NONE") {
-        if (!normalizeRepeatUntil) {
-            throw new ApiError(400, "repeatUntil required for recurrence");
+    for (const schedule of existingSchedule) {
+        if (hasTimeConflict(schedule, normalizeStartTime, normalizeEndTime)) {
+            throw new ApiError(409,
+                `Schedule conflict with existing "${task.title}" - (${schedule.startTime} - ${schedule.endTime})`);
         }
     }
 
-    if (normalizeRepeatUntil && isNaN(normalizeRepeatUntil.getTime())) {
-        throw new ApiError(400, "Invalid repeatUntil date");
+    // Duplicate were to check the schedule is already exists or not
+    const duplicateWhere = {
+        userId,
+        taskId,
+        scheduleDate: new Date(scheduleDate),
+        startTime: normalizeStartTime,
+        endTime: normalizeEndTime,
+        recurrence,
+        repeatUntil: normalizeRepeatUntil,
     }
 
-    if (recurrence === "WEEKLY" && (!repeatOnDays || repeatOnDays.length === 0)) {
-        throw new ApiError(400, "repeatOnDays required for weekly recurrence");
+    // Only include repeatOnDays if recurrence is WEEKLY
+    if (recurrence === "WEEKLY") {
+        duplicateWhere.repeatOnDays = {
+            equals: repeatOnDays
+        };
+    }
+
+    // Duplicate check
+    const Duplicate = await prisma.schedule.findFirst({
+        where: duplicateWhere
+    });
+
+    if (Duplicate) {
+        throw new ApiError(409, "Schedule already exists");
     }
 
     // Create a schedule
     const schedule = await prisma.schedule.create({
         data: {
             scheduleDate: new Date(scheduleDate),
-            startTime: new Date(`1970-01-01T${startTime}:00`),
-            endTime: new Date(`1970-01-01T${endTime}:00`),
+            startTime: normalizeStartTime,
+            endTime: normalizeEndTime,
             recurrence,
-            repeatUntil: repeatUntil ? new Date(repeatUntil) : null,
-            repeatOnDays,
+            repeatUntil: normalizeRepeatUntil,
+            repeatOnDays: repeatOnDays ?? [],
             userId,
             taskId
         }
@@ -122,4 +150,16 @@ export const getSchedules = async (userId, from, to, taskId) => {
         ]
     });
     return schedules;
+};
+
+
+
+
+
+// Helpers
+const hasTimeConflict = (existing, startTime, endTime) => {
+    return (
+        existing.startTime < endTime &&
+        startTime < existing.endTime
+    );
 };
