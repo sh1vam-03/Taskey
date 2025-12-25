@@ -267,6 +267,30 @@ export const updateSchedule = async (userId, scheduleId, data) => {
 };
 
 
+export const deleteSchedule = async (userId, scheduleId) => {
+
+    // Find schedule owner
+    const schedule = await prisma.schedule.findFirst({
+        where: {
+            id: scheduleId,
+            userId
+        }
+    });
+
+    if (!schedule) {
+        throw new ApiError(404, "Schedule not found");
+    }
+
+    // Delete the schedule
+    await prisma.schedule.delete({
+        where: {
+            id: scheduleId,
+        }
+    });
+    return "Schedule deleted successfully";
+};
+
+
 // Helpers
 const hasTimeConflict = (existing, startTime, endTime) => {
     return (

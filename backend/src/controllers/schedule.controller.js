@@ -205,3 +205,22 @@ export const updateSchedule = asyncHandler(async (req, res) => {
         data: schedule
     });
 });
+
+
+/**
+ * @route DELETE /api/schedules/:id
+ * @desc Delete a schedule
+ * @access Private
+ */
+
+export const deleteSchedule = asyncHandler(async (req, res) => {
+    const userId = req.user.userId;
+    const scheduleId = req.params.id;
+
+    const schedule = await scheduleService.deleteSchedule(userId, scheduleId);
+
+    res.status(200).json({
+        success: true,
+        message: schedule
+    });
+});
