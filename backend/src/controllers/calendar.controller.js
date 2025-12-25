@@ -3,11 +3,11 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 
 
-export const getDayCalender = asyncHandler(async (req, res) => {
+export const getDayCalendar = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
     const { date } = req.query;
 
-    const data = await calendarService.getDayCalender(date, userId);
+    const data = await calendarService.getDayCalendar(date, userId);
 
     res.status(200).json({
         success: true,
@@ -17,11 +17,11 @@ export const getDayCalender = asyncHandler(async (req, res) => {
 });
 
 
-export const getWeekCalender = asyncHandler(async (req, res) => {
+export const getWeekCalendar = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
     const { date } = req.query;
 
-    const data = await calendarService.getWeekCalender(date, userId);
+    const data = await calendarService.getWeekCalendar(date, userId);
 
     res.status(200).json({
         success: true,
@@ -30,12 +30,12 @@ export const getWeekCalender = asyncHandler(async (req, res) => {
     });
 });
 
-export const getMonthCalender = asyncHandler(async (req, res) => {
+export const getMonthCalendar = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
     const { year, month } = req.query;
 
 
-    const data = await calendarService.getMonthCalender(Number(year), Number(month), userId);
+    const data = await calendarService.getMonthCalendar(Number(year), Number(month), userId);
 
     res.status(200).json({
         success: true,
