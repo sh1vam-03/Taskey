@@ -88,8 +88,9 @@ CREATE TABLE "Schedule" (
     "endTime" TIME NOT NULL,
     "recurrence" "RecurrenceType" NOT NULL DEFAULT 'NONE',
     "repeatUntil" DATE,
-    "repeatOnDays" INTEGER[],
+    "repeatOnDays" INTEGER[] DEFAULT ARRAY[]::INTEGER[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
     "taskId" TEXT NOT NULL,
 
