@@ -27,26 +27,64 @@ export const getDayCalendar = async (dateString, userId) => {
     const completions = await prisma.taskCompletion.findMany({
         where: {
             userId,
-            completedDate: date
+            completedDate: { gte: date, lte: date }
+        },
+        select: {
+            taskId: true,
+            completedDate: true,
+            completedAt: true
         }
     });
 
-    const completedSet = new Set(completions.map(c => c.taskId));
+
+    const completionMap = new Map();
+
+    /*
+     Map structure:
+     {
+       "2025-12-25" => Map(taskId => completedAt)
+     }
+    */
+
+    for (const c of completions) {
+        const dateKey = c.completedDate.toISOString().slice(0, 10);
+
+        if (!completionMap.has(dateKey)) {
+            completionMap.set(dateKey, new Map());
+        }
+
+        completionMap.get(dateKey).set(c.taskId, c.completedAt);
+    }
+
+
+
+    const dayKey = date.toISOString().slice(0, 10);
 
     return {
         date: dateString,
         schedules: schedules
-            .filter(s => appliesOnDate(s, date))
-            .map(s => ({
-                scheduleId: s.id,
-                taskId: s.task.id,
-                title: s.task.title,
-                priority: s.task.priority,
-                startTime: formatTime(s.startTime),
-                endTime: formatTime(s.endTime),
-                status: completedSet.has(s.taskId) ? "COMPLETED" : "PENDING"
-            }))
+            .filter(schedule => appliesOnDate(schedule, date))
+            .map(schedule => {
+                const completedAt =
+                    completionMap.get(dayKey)?.get(schedule.taskId) ?? null;
+
+                let status = "PENDING";
+                if (completedAt) status = "COMPLETED";
+                else if (date < todayUTC()) status = "MISSED";
+
+                return {
+                    scheduleId: schedule.id,
+                    taskId: schedule.task.id,
+                    title: schedule.task.title,
+                    priority: schedule.task.priority,
+                    startTime: formatTime(schedule.startTime),
+                    endTime: formatTime(schedule.endTime),
+                    status,
+                    completedAt
+                };
+            })
     };
+
 };
 
 
@@ -71,6 +109,39 @@ export const getWeekCalendar = async (dateString, userId) => {
         }
     });
 
+    const completions = await prisma.taskCompletion.findMany({
+        where: {
+            userId,
+            completedDate: { gte: weekStart, lte: weekEnd }
+        },
+        select: {
+            taskId: true,
+            completedDate: true,
+            completedAt: true
+        }
+    });
+
+
+    const completionMap = new Map();
+
+    /*
+     Map structure:
+     {
+       "2025-12-25" => Map(taskId => completedAt)
+     }
+    */
+
+    for (const c of completions) {
+        const dateKey = c.completedDate.toISOString().slice(0, 10);
+
+        if (!completionMap.has(dateKey)) {
+            completionMap.set(dateKey, new Map());
+        }
+
+        completionMap.get(dateKey).set(c.taskId, c.completedAt);
+    }
+
+
     const days = {};
     for (let d = new Date(weekStart); d <= weekEnd; d.setUTCDate(d.getUTCDate() + 1)) {
         const key = d.toISOString().slice(0, 10);
@@ -81,11 +152,22 @@ export const getWeekCalendar = async (dateString, userId) => {
         for (const dayKey of Object.keys(days)) {
             const dayDate = new Date(`${dayKey}T00:00:00Z`);
             if (appliesOnDate(schedule, dayDate)) {
+                const completedAt =
+                    completionMap.get(dayKey)?.get(schedule.taskId) ?? null;
+
+                let status = "PENDING";
+                if (completedAt) status = "COMPLETED";
+                else if (dayDate < todayUTC()) status = "MISSED";
+
                 days[dayKey].push({
+                    scheduleId: schedule.id,
                     taskId: schedule.task.id,
                     title: schedule.task.title,
+                    priority: schedule.task.priority,
                     startTime: formatTime(schedule.startTime),
-                    endTime: formatTime(schedule.endTime)
+                    endTime: formatTime(schedule.endTime),
+                    status,
+                    completedAt
                 });
             }
         }
@@ -115,6 +197,39 @@ export const getMonthCalendar = async (year, month, userId) => {
         }
     });
 
+    const completions = await prisma.taskCompletion.findMany({
+        where: {
+            userId,
+            completedDate: { gte: monthStart, lte: monthEnd }
+        },
+        select: {
+            taskId: true,
+            completedDate: true,
+            completedAt: true
+        }
+    });
+
+
+    const completionMap = new Map();
+
+    /*
+     Map structure:
+     {
+       "2025-12-25" => Map(taskId => completedAt)
+     }
+    */
+
+    for (const c of completions) {
+        const dateKey = c.completedDate.toISOString().slice(0, 10);
+
+        if (!completionMap.has(dateKey)) {
+            completionMap.set(dateKey, new Map());
+        }
+
+        completionMap.get(dateKey).set(c.taskId, c.completedAt);
+    }
+
+
     const days = {};
     for (let d = new Date(monthStart); d <= monthEnd; d.setUTCDate(d.getUTCDate() + 1)) {
         const key = d.toISOString().slice(0, 10);
@@ -125,11 +240,21 @@ export const getMonthCalendar = async (year, month, userId) => {
         for (const key of Object.keys(days)) {
             const dayDate = new Date(`${key}T00:00:00Z`);
             if (appliesOnDate(schedule, dayDate)) {
+                const dayKey = dayDate.toISOString().slice(0, 10);
+                const completedAt = completionMap.get(dayKey)?.get(schedule.taskId) ?? null;
+
+                let status = "PENDING";
+                if (completedAt) status = "COMPLETED";
+                else if (dayDate < todayUTC()) status = "MISSED";
                 days[key].push({
+                    scheduleId: schedule.id,
                     taskId: schedule.task.id,
                     title: schedule.task.title,
+                    priority: schedule.task.priority,
                     startTime: formatTime(schedule.startTime),
-                    endTime: formatTime(schedule.endTime)
+                    endTime: formatTime(schedule.endTime),
+                    status,
+                    completedAt
                 });
             }
         }
@@ -189,6 +314,16 @@ const normalizeDate = (dateString) => {
     if (isNaN(d)) throw new ApiError(400, "Invalid date");
     return d;
 };
+
+function todayUTC() {
+    const now = new Date();
+    return new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate()
+    ));
+}
+
 
 const formatTime = (time) => {
     if (!time) return null;
