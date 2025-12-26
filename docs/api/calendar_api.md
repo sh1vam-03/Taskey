@@ -36,7 +36,8 @@ Retrieves the schedule and task status for a specific day.
         "priority": "HIGH",
         "startTime": "09:00",
         "endTime": "09:30",
-        "status": "COMPLETED" 
+        "status": "COMPLETED",
+        "notes": "Discuss blockers"
       },
       {
         "scheduleId": 2,
@@ -45,13 +46,14 @@ Retrieves the schedule and task status for a specific day.
         "priority": "MEDIUM",
         "startTime": "14:00",
         "endTime": "15:00",
-        "status": "PENDING"
+        "status": "PENDING",
+        "notes": null
       }
     ]
   }
 }
 ```
-*Status values*: `PENDING`, `COMPLETED`, `MISSED`
+*Status values*: `PENDING` (Scheduled), `COMPLETED` (Done), `MISSED` (Past due date)
 
 ---
 
