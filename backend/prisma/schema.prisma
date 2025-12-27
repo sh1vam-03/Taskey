@@ -7,9 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//============================
+//////////////////////
 // ENUMS
-//============================
+//////////////////////
 
 enum TaskPriority {
   LOW
@@ -35,9 +35,9 @@ enum RecurrenceType {
   MONTHLY
 }
 
-//============================
-// USER MODEL
-//============================
+//////////////////////
+// USER
+//////////////////////
 
 model User {
   id              String  @id @default(uuid())
@@ -50,21 +50,23 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tasks           Task[]
-  schedules       Schedule[]
-  behaviors       BehaviorLog[]
-  otps            Otp[]
-  taskCompletions TaskCompletion[]
-  categories      Category[]
+  tasks                Task[]
+  schedules            Schedule[]
+  scheduleCompletions  ScheduleCompletion[]
+  taskDailyCompletions TaskDailyCompletion[]
+  missedSchedules      MissedSchedule[]
+  categories           Category[]
+  behaviors            BehaviorLog[]
+  otps                 Otp[]
 }
 
-//============================
-// OTP MODEL (Email Verification & Reset)
-//============================
+//////////////////////
+// OTP
+//////////////////////
 
 model Otp {
   id        String     @id @default(uuid())
-  code      String // hashed OTP recommended
+  code      String
   purpose   OtpPurpose
   expiresAt DateTime
   isUsed    Boolean    @default(false)
@@ -77,9 +79,9 @@ model Otp {
   @@index([userId, purpose])
 }
 
-//============================
-// TASK MANAGEMENT
-//============================
+//////////////////////
+// TASK
+//////////////////////
 
 model Task {
   id          String       @id @default(uuid())
@@ -89,15 +91,14 @@ model Task {
   dueDate     DateTime?
   order       Int?
 
-  // Category relation
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  schedules   Schedule[]
-  completions TaskCompletion[]
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  schedules        Schedule[]
+  dailyCompletions TaskDailyCompletion[]
 
   isArchived Boolean   @default(false)
   deletedAt  DateTime?
@@ -109,11 +110,15 @@ model Task {
   @@index([categoryId])
 }
 
+//////////////////////
+// CATEGORY
+//////////////////////
+
 model Category {
   id    String  @id @default(uuid())
   name  String
-  color String? // optional (UI use)
-  icon  String? // optional
+  color String?
+  icon  String?
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -123,29 +128,13 @@ model Category {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, name]) // user cannot have duplicate category names
+  @@unique([userId, name])
   @@index([userId])
 }
 
-model TaskCompletion {
-  id            String   @id @default(uuid())
-  completedDate DateTime @db.Date
-  completedAt   DateTime @default(now())
-
-  taskId String
-  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([taskId, completedDate])
-  @@index([userId, completedDate])
-  @@index([taskId])
-}
-
-//============================
-// SCHEDULE PLANNER
-//============================
+//////////////////////
+// SCHEDULE
+//////////////////////
 
 model Schedule {
   id    String  @id @default(uuid())
@@ -157,10 +146,7 @@ model Schedule {
 
   recurrence   RecurrenceType @default(NONE)
   repeatUntil  DateTime?      @db.Date
-  repeatOnDays Int[]          @default([]) // [1, 3, 6, 7] → Mon, Wed, Sat, Sun
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  repeatOnDays Int[]          @default([])
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -168,13 +154,85 @@ model Schedule {
   taskId String
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
-  @@index([userId, scheduleDate])
+  // 🔥 FIX HERE
+  completions     ScheduleCompletion[]
+  missedSchedules MissedSchedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([taskId])
+  @@index([userId])
+  @@index([userId, scheduleDate])
+  @@index([recurrence, scheduleDate])
+  @@index([repeatUntil])
 }
 
-//============================
-// BEHAVIOR & HABIT TRACKING
-//============================
+//////////////////////
+// SCHEDULE COMPLETION (MOST IMPORTANT)
+//////////////////////
+
+model ScheduleCompletion {
+  id          String   @id @default(uuid())
+  completedAt DateTime @default(now())
+  completedOn DateTime @db.Date
+
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduleId, completedOn])
+  @@index([userId, completedOn])
+  @@index([completedOn])
+  @@index([scheduleId])
+}
+
+//////////////////////
+// TASK DAILY COMPLETION (NO SCHEDULE)
+//////////////////////
+
+model TaskDailyCompletion {
+  id            String   @id @default(uuid())
+  completedDate DateTime @db.Date
+  completedAt   DateTime @default(now())
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, completedDate])
+  @@index([completedDate])
+  @@index([userId, completedDate])
+}
+
+//////////////////////
+// MISSED SCHEDULE (CRON GENERATED)
+//////////////////////
+
+model MissedSchedule {
+  id       String   @id @default(uuid())
+  missedAt DateTime @default(now())
+  missedOn DateTime @db.Date
+
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduleId, missedOn])
+  @@index([missedOn])
+  @@index([userId, missedOn])
+  @@index([scheduleId])
+}
+
+//////////////////////
+// BEHAVIOR LOG
+//////////////////////
 
 model BehaviorLog {
   id                String   @id @default(uuid())
@@ -192,6 +250,10 @@ model BehaviorLog {
 
   @@unique([userId, date])
 }
+
+//////////////////////
+// CONTACT US
+//////////////////////
 
 model ContactUs {
   id      String @id @default(uuid())

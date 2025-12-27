@@ -27,33 +27,34 @@ Retrieves the schedule and task status for a specific day.
   "success": true,
   "message": "Calendar day data fetched successfully",
   "data": {
+  "data": {
     "date": "2023-12-25",
-    "schedules": [
+    "items": [
       {
+        "type": "SCHEDULED",
         "scheduleId": 1,
         "taskId": "uuid-1",
         "title": "Morning Standup",
         "priority": "HIGH",
         "startTime": "09:00",
         "endTime": "09:30",
-        "status": "COMPLETED",
-        "notes": "Discuss blockers"
+        "status": "COMPLETED"
       },
       {
-        "scheduleId": 2,
-        "taskId": "uuid-2",
-        "title": "Client Meeting",
-        "priority": "MEDIUM",
-        "startTime": "14:00",
-        "endTime": "15:00",
-        "status": "PENDING",
-        "notes": null
+        "type": "UNSCHEDULED",
+        "taskId": "uuid-3",
+        "title": "Daily Journal",
+        "priority": "LOW",
+        "startTime": null,
+        "endTime": null,
+        "status": "PENDING"
       }
     ]
   }
 }
 ```
-*Status values*: `PENDING` (Scheduled), `COMPLETED` (Done), `MISSED` (Past due date)
+*Status values*: `PENDING`, `COMPLETED`, `MISSED`
+*Type values*: `SCHEDULED`, `UNSCHEDULED`
 
 ---
 
@@ -80,26 +81,26 @@ Retrieves the schedule for a full week surrounding the given date.
   "data": {
     "weekStart": "2023-12-25",
     "weekEnd": "2023-12-31",
-    "days": [
-      {
-        "date": "2023-12-25",
-        "schedules": [
-          {
-            "scheduleId": 1,
-            "title": "Task 1",
-            "startTime": "09:00",
-            "endTime": "10:00",
-            "status": "COMPLETED"
-            // ... other fields
-          }
-        ]
-      },
-      {
-        "date": "2023-12-26",
-        "schedules": []
-      }
+    "days": {
+      "2023-12-25": [
+        {
+          "type": "SCHEDULED",
+          "scheduleId": 1,
+          "title": "Task 1",
+          "startTime": "09:00",
+          "endTime": "10:00",
+          "status": "COMPLETED"
+        },
+        {
+           "type": "UNSCHEDULED",
+           "taskId": "uuid-5",
+           "title": "Quick Note",
+           "status": "PENDING"
+        }
+      ],
+      "2023-12-26": []
       // ... rest of the week
-    ]
+    }
   }
 }
 ```
@@ -130,18 +131,16 @@ Retrieves the schedule for a specific month.
   "data": {
     "month": "2023-12",
     "days": {
-      "2023-12-01": {
-        "date": "2023-12-01",
-        "schedules": [
-           {
-             "scheduleId": 10,
-             "title": "Monthly Review",
-             "startTime": "10:00",
-             "endTime": "11:00",
-             "status": "PENDING"
-           }
-        ]
-      },
+      "2023-12-01": [
+         {
+           "scheduleId": 10,
+           "title": "Monthly Review",
+           "startTime": "10:00",
+           "endTime": "11:00",
+           "status": "PENDING",
+           "notes": null
+         }
+      ],
       // ... rest of the month
     }
   }

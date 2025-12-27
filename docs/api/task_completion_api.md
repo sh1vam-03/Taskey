@@ -54,7 +54,7 @@ Removes the completion status for a specific task on a given date.
 ### Request Body
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `date` | string | No | Date to undo completion for. Defaults to today. |
+| `date` | string | **Yes** | Date of completion (YYYY-MM-DD). Required to undo. |
 
 ### Success Response (200 OK)
 ```json
@@ -115,7 +115,7 @@ Marks multiple tasks as completed at once.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `taskIds` | string[] | **Yes** | Array of task UUIDs |
-| `date` | string | No | Completion date. Defaults to today. |
+| `date` | string | No | Date of completion (YYYY-MM-DD). Defaults to today. |
 
 ### Success Response (200 OK)
 ```json
