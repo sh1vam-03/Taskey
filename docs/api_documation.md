@@ -20,6 +20,7 @@ The API is designed around **RESTful** principles and uses standard **HTTP statu
 | **✅ Task Completion** | Mark tasks as Done/Undone, History, Bulk actions. | [View Completion API](./api/task_completion_api.md) |
 | **📅 Calendar** | Day, Week, and Month views of scheduled tasks. | [View Calendar API](./api/calendar_api.md) |
 | **🕒 Schedule Management** | Create and manage time blocks for tasks. | [View Schedule API](./api/schedule_api.md) |
+| **🏁 Schedule Completion** | Track schedule execution (done/missed). | [View Schedule Completion API](./api/schedule_completion_api.md) |
 ---
 
 ## ⚠️ Common Standards

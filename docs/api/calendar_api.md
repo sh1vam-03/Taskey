@@ -80,26 +80,21 @@ Retrieves the schedule for a full week surrounding the given date.
   "data": {
     "weekStart": "2023-12-25",
     "weekEnd": "2023-12-31",
-    "days": [
-      {
-        "date": "2023-12-25",
-        "schedules": [
-          {
-            "scheduleId": 1,
-            "title": "Task 1",
-            "startTime": "09:00",
-            "endTime": "10:00",
-            "status": "COMPLETED"
-            // ... other fields
-          }
-        ]
-      },
-      {
-        "date": "2023-12-26",
-        "schedules": []
-      }
+    "days": {
+      "2023-12-25": [
+        {
+          "scheduleId": 1,
+          "title": "Task 1",
+          "startTime": "09:00",
+          "endTime": "10:00",
+          "status": "COMPLETED",
+          "notes": "Discuss blockers"
+          // ... other fields
+        }
+      ],
+      "2023-12-26": []
       // ... rest of the week
-    ]
+    }
   }
 }
 ```
@@ -130,18 +125,16 @@ Retrieves the schedule for a specific month.
   "data": {
     "month": "2023-12",
     "days": {
-      "2023-12-01": {
-        "date": "2023-12-01",
-        "schedules": [
-           {
-             "scheduleId": 10,
-             "title": "Monthly Review",
-             "startTime": "10:00",
-             "endTime": "11:00",
-             "status": "PENDING"
-           }
-        ]
-      },
+      "2023-12-01": [
+         {
+           "scheduleId": 10,
+           "title": "Monthly Review",
+           "startTime": "10:00",
+           "endTime": "11:00",
+           "status": "PENDING",
+           "notes": null
+         }
+      ],
       // ... rest of the month
     }
   }
