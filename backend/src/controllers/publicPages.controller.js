@@ -22,7 +22,7 @@ export const createContactUs = asyncHandler(async (req, res) => {
     // Send Response
     return res.status(201).json({
         success: true,
-        message: "Your contact us message has been sent successfully",
+        message: "Your message has been sent successfully",
         data: {
             name: result.name,
             subject: result.subject,

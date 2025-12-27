@@ -1,20 +1,22 @@
 import prisma from "../config/db.js";
 import ApiError from "../utils/ApiError.js";
 
-/**
- * Normalize date to UTC start-of-day
- */
-const normalizeDate = (date) => {
+
+function normalizeUTCDate(date) {
     const d = date ? new Date(date) : new Date();
-    d.setUTCHours(0, 0, 0, 0);
-    return d;
-};
+    return new Date(Date.UTC(
+        d.getUTCFullYear(),
+        d.getUTCMonth(),
+        d.getUTCDate()
+    ));
+}
+
 
 /**
  * Complete a task for a specific day (NO schedule)
  */
 export const completeTask = async (userId, taskId, date) => {
-    const completedDate = normalizeDate(date);
+    const completedDate = normalizeUTCDate(date);
 
     // 1️⃣ Verify task ownership & not deleted
     const task = await prisma.task.findFirst({
@@ -57,7 +59,7 @@ export const completeTask = async (userId, taskId, date) => {
  * Undo task completion for a specific day
  */
 export const undoTaskCompletion = async (userId, taskId, date) => {
-    const completedDate = normalizeDate(date);
+    const completedDate = normalizeUTCDate(date);
 
     const completion = await prisma.taskDailyCompletion.findUnique({
         where: {
@@ -68,8 +70,12 @@ export const undoTaskCompletion = async (userId, taskId, date) => {
         }
     });
 
-    if (!completion || completion.userId !== userId) {
+    if (!completion) {
         throw new ApiError(404, "Task completion not found");
+    }
+
+    if (completion.userId !== userId) {
+        throw new ApiError(403, "Unauthorized");
     }
 
     await prisma.taskDailyCompletion.delete({
@@ -117,7 +123,7 @@ export const completeBulkTasks = async (userId, taskIds, date) => {
         throw new ApiError(400, "taskIds must be a non-empty array");
     }
 
-    const completedDate = normalizeDate(date);
+    const completedDate = normalizeUTCDate(date);
 
     // 1️⃣ Verify tasks
     const tasks = await prisma.task.findMany({

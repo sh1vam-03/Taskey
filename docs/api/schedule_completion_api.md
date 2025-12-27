@@ -18,13 +18,8 @@ Marks a specific schedule as completed for a specific date (defaulting to today)
 
 ### Headers
 | Key | Value | Required | Description |
-|-----|-------|----------|-------------|
-| `Authorization` | `Bearer <token>` | **Yes** | JWT access token |
-
-### Request Body
-| Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `date` | string | No | Date of completion (YYYY-MM-DD). Defaults to today. |
+| `Authorization` | `Bearer <token>` | **Yes** | JWT access token |
 
 ### Success Response (201 Created)
 ```json
@@ -54,13 +49,8 @@ Reverts the completion status of a schedule for a specific date.
 
 ### Headers
 | Key | Value | Required | Description |
-|-----|-------|----------|-------------|
-| `Authorization` | `Bearer <token>` | **Yes** | JWT access token |
-
-### Request Body
-| Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `date` | string | No | Date of completion to undo (YYYY-MM-DD). Defaults to today. |
+| `Authorization` | `Bearer <token>` | **Yes** | JWT access token |
 
 ### Success Response (200 OK)
 ```json
@@ -86,7 +76,6 @@ Marks multiple schedules as completed for a specific date. Skips already complet
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `scheduleIds` | number[] | **Yes** | Array of Schedule IDs |
-| `date` | string | No | Date of completion (YYYY-MM-DD). Defaults to today. |
 
 ### Success Response (201 Created)
 ```json

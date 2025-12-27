@@ -27,8 +27,9 @@ Retrieves the schedule and task status for a specific day.
   "success": true,
   "message": "Calendar day data fetched successfully",
   "data": {
+  "data": {
     "date": "2023-12-25",
-    "schedules": [
+    "items": [
       {
         "type": "SCHEDULED",
         "scheduleId": 1,
@@ -83,13 +84,18 @@ Retrieves the schedule for a full week surrounding the given date.
     "days": {
       "2023-12-25": [
         {
+          "type": "SCHEDULED",
           "scheduleId": 1,
           "title": "Task 1",
           "startTime": "09:00",
           "endTime": "10:00",
-          "status": "COMPLETED",
-          "notes": "Discuss blockers"
-          // ... other fields
+          "status": "COMPLETED"
+        },
+        {
+           "type": "UNSCHEDULED",
+           "taskId": "uuid-5",
+           "title": "Quick Note",
+           "status": "PENDING"
         }
       ],
       "2023-12-26": []

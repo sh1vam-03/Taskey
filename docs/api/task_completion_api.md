@@ -54,7 +54,7 @@ Removes the completion status for a specific task on a given date.
 ### Request Body
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `date` | string | No | Date of completion (YYYY-MM-DD). Defaults to today. |
+| `date` | string | **Yes** | Date of completion (YYYY-MM-DD). Required to undo. |
 
 ### Success Response (200 OK)
 ```json
