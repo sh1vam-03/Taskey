@@ -45,18 +45,19 @@ model User {
   email           String  @unique
   password        String
   isEmailVerified Boolean @default(false)
-  timezone        String?
+  timezone        String? // e.g. "Asia/Kolkata"
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  tasks           Task[]
-  schedules       Schedule[]
-  taskCompletions TaskCompletion[]
-  categories      Category[]
-  behaviors       BehaviorLog[]
-  otps            Otp[]
-  missedSchedules MissedSchedule[]
+  tasks                Task[]
+  schedules            Schedule[]
+  scheduleCompletions  ScheduleCompletion[]
+  taskDailyCompletions TaskDailyCompletion[]
+  missedSchedules      MissedSchedule[]
+  categories           Category[]
+  behaviors            BehaviorLog[]
+  otps                 Otp[]
 }
 
 //////////////////////
@@ -96,8 +97,8 @@ model Task {
   categoryId String?
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
-  schedules   Schedule[]
-  completions TaskCompletion[]
+  schedules        Schedule[]
+  dailyCompletions TaskDailyCompletion[]
 
   isArchived Boolean   @default(false)
   deletedAt  DateTime?
@@ -153,51 +154,80 @@ model Schedule {
   taskId String
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
-  completions TaskCompletion[]
+  // 🔥 FIX HERE
+  completions     ScheduleCompletion[]
+  missedSchedules MissedSchedule[]
 
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  missedSchedule MissedSchedule?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([userId, scheduleDate])
   @@index([taskId])
-}
-
-model MissedSchedule {
-  id         String   @id @default(uuid())
-  scheduleId String   @unique
-  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
-
-  missedAt DateTime @default(now())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@index([userId])
+  @@index([userId, scheduleDate])
+  @@index([recurrence, scheduleDate])
+  @@index([repeatUntil])
 }
 
 //////////////////////
-// TASK COMPLETION (IMPORTANT)
+// SCHEDULE COMPLETION (MOST IMPORTANT)
 //////////////////////
 
-model TaskCompletion {
+model ScheduleCompletion {
   id          String   @id @default(uuid())
   completedAt DateTime @default(now())
+  completedOn DateTime @db.Date
 
-  // For scheduled completion (morning/evening etc.)
-  scheduleId String?
-  schedule   Schedule? @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
-
-  // For unscheduled / day-based completion
-  taskId String?
-  task   Task?   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([scheduleId])
-  @@index([taskId])
-  @@index([userId])
+  @@unique([scheduleId, completedOn])
+  @@index([userId, completedOn])
+  @@index([completedOn])
+  @@index([scheduleId])
+}
+
+//////////////////////
+// TASK DAILY COMPLETION (NO SCHEDULE)
+//////////////////////
+
+model TaskDailyCompletion {
+  id            String   @id @default(uuid())
+  completedDate DateTime @db.Date
+  completedAt   DateTime @default(now())
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, completedDate])
+  @@index([completedDate])
+  @@index([userId, completedDate])
+}
+
+//////////////////////
+// MISSED SCHEDULE (CRON GENERATED)
+//////////////////////
+
+model MissedSchedule {
+  id       String   @id @default(uuid())
+  missedAt DateTime @default(now())
+  missedOn DateTime @db.Date
+
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduleId, missedOn])
+  @@index([missedOn])
+  @@index([userId, missedOn])
+  @@index([scheduleId])
 }
 
 //////////////////////

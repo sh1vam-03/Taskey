@@ -87,24 +87,36 @@ CREATE TABLE "Schedule" (
 );
 
 -- CreateTable
-CREATE TABLE "MissedSchedule" (
+CREATE TABLE "ScheduleCompletion" (
     "id" TEXT NOT NULL,
+    "completedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "completedOn" DATE NOT NULL,
     "scheduleId" TEXT NOT NULL,
-    "missedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT NOT NULL,
 
-    CONSTRAINT "MissedSchedule_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ScheduleCompletion_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "TaskCompletion" (
+CREATE TABLE "TaskDailyCompletion" (
     "id" TEXT NOT NULL,
+    "completedDate" DATE NOT NULL,
     "completedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "scheduleId" TEXT,
-    "taskId" TEXT,
+    "taskId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
 
-    CONSTRAINT "TaskCompletion_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "TaskDailyCompletion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "MissedSchedule" (
+    "id" TEXT NOT NULL,
+    "missedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "missedOn" DATE NOT NULL,
+    "scheduleId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "MissedSchedule_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -153,25 +165,52 @@ CREATE INDEX "Category_userId_idx" ON "Category"("userId");
 CREATE UNIQUE INDEX "Category_userId_name_key" ON "Category"("userId", "name");
 
 -- CreateIndex
-CREATE INDEX "Schedule_userId_scheduleDate_idx" ON "Schedule"("userId", "scheduleDate");
-
--- CreateIndex
 CREATE INDEX "Schedule_taskId_idx" ON "Schedule"("taskId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "MissedSchedule_scheduleId_key" ON "MissedSchedule"("scheduleId");
+CREATE INDEX "Schedule_userId_idx" ON "Schedule"("userId");
 
 -- CreateIndex
-CREATE INDEX "MissedSchedule_userId_idx" ON "MissedSchedule"("userId");
+CREATE INDEX "Schedule_userId_scheduleDate_idx" ON "Schedule"("userId", "scheduleDate");
 
 -- CreateIndex
-CREATE INDEX "TaskCompletion_taskId_idx" ON "TaskCompletion"("taskId");
+CREATE INDEX "Schedule_recurrence_scheduleDate_idx" ON "Schedule"("recurrence", "scheduleDate");
 
 -- CreateIndex
-CREATE INDEX "TaskCompletion_userId_idx" ON "TaskCompletion"("userId");
+CREATE INDEX "Schedule_repeatUntil_idx" ON "Schedule"("repeatUntil");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "TaskCompletion_scheduleId_key" ON "TaskCompletion"("scheduleId");
+CREATE INDEX "ScheduleCompletion_userId_completedOn_idx" ON "ScheduleCompletion"("userId", "completedOn");
+
+-- CreateIndex
+CREATE INDEX "ScheduleCompletion_completedOn_idx" ON "ScheduleCompletion"("completedOn");
+
+-- CreateIndex
+CREATE INDEX "ScheduleCompletion_scheduleId_idx" ON "ScheduleCompletion"("scheduleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ScheduleCompletion_scheduleId_completedOn_key" ON "ScheduleCompletion"("scheduleId", "completedOn");
+
+-- CreateIndex
+CREATE INDEX "TaskDailyCompletion_completedDate_idx" ON "TaskDailyCompletion"("completedDate");
+
+-- CreateIndex
+CREATE INDEX "TaskDailyCompletion_userId_completedDate_idx" ON "TaskDailyCompletion"("userId", "completedDate");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TaskDailyCompletion_taskId_completedDate_key" ON "TaskDailyCompletion"("taskId", "completedDate");
+
+-- CreateIndex
+CREATE INDEX "MissedSchedule_missedOn_idx" ON "MissedSchedule"("missedOn");
+
+-- CreateIndex
+CREATE INDEX "MissedSchedule_userId_missedOn_idx" ON "MissedSchedule"("userId", "missedOn");
+
+-- CreateIndex
+CREATE INDEX "MissedSchedule_scheduleId_idx" ON "MissedSchedule"("scheduleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "MissedSchedule_scheduleId_missedOn_key" ON "MissedSchedule"("scheduleId", "missedOn");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "BehaviorLog_userId_date_key" ON "BehaviorLog"("userId", "date");
@@ -198,19 +237,22 @@ ALTER TABLE "Schedule" ADD CONSTRAINT "Schedule_userId_fkey" FOREIGN KEY ("userI
 ALTER TABLE "Schedule" ADD CONSTRAINT "Schedule_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "ScheduleCompletion" ADD CONSTRAINT "ScheduleCompletion_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "Schedule"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ScheduleCompletion" ADD CONSTRAINT "ScheduleCompletion_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TaskDailyCompletion" ADD CONSTRAINT "TaskDailyCompletion_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TaskDailyCompletion" ADD CONSTRAINT "TaskDailyCompletion_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "MissedSchedule" ADD CONSTRAINT "MissedSchedule_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "Schedule"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "MissedSchedule" ADD CONSTRAINT "MissedSchedule_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TaskCompletion" ADD CONSTRAINT "TaskCompletion_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "Schedule"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TaskCompletion" ADD CONSTRAINT "TaskCompletion_taskId_fkey" FOREIGN KEY ("taskId") REFERENCES "Task"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TaskCompletion" ADD CONSTRAINT "TaskCompletion_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BehaviorLog" ADD CONSTRAINT "BehaviorLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -1,30 +1,36 @@
 import prisma from "../config/db.js";
 import ApiError from "../utils/ApiError.js";
 
+/**
+ * Normalize date to UTC start-of-day
+ */
+const normalizeDate = (date) => {
+    const d = date ? new Date(date) : new Date();
+    d.setUTCHours(0, 0, 0, 0);
+    return d;
+};
 
-
+/**
+ * Complete a task for a specific day (NO schedule)
+ */
 export const completeTask = async (userId, taskId, date) => {
+    const completedDate = normalizeDate(date);
 
-    const completedDate = date ? new Date(date) : new Date();
-    completedDate.setHours(0, 0, 0, 0);
-
-    const completedAt = new Date();
-
-    // Find task (owner + soft delete check)
+    // 1️⃣ Verify task ownership & not deleted
     const task = await prisma.task.findFirst({
         where: {
             id: taskId,
             userId,
             deletedAt: null
-        },
+        }
     });
 
     if (!task) {
         throw new ApiError(404, "Task not found");
     }
 
-    // check if task is already completed
-    const taskCompletion = await prisma.taskCompletion.findUnique({
+    // 2️⃣ Prevent duplicate completion
+    const existing = await prisma.taskDailyCompletion.findUnique({
         where: {
             taskId_completedDate: {
                 taskId,
@@ -33,77 +39,62 @@ export const completeTask = async (userId, taskId, date) => {
         }
     });
 
-    if (taskCompletion) {
-        throw new ApiError(400, "Task already completed for this date");
+    if (existing) {
+        throw new ApiError(409, "Task already completed for this date");
     }
 
-    // create task completion
-    await prisma.taskCompletion.create({
+    // 3️⃣ Create completion
+    return prisma.taskDailyCompletion.create({
         data: {
             taskId,
             userId,
-            completedDate,
-            completedAt
+            completedDate
         }
     });
+};
 
-    return;
-}
-
+/**
+ * Undo task completion for a specific day
+ */
 export const undoTaskCompletion = async (userId, taskId, date) => {
-    const completedDate = date ? new Date(date) : new Date();
-    completedDate.setHours(0, 0, 0, 0);
+    const completedDate = normalizeDate(date);
 
-    // Create end of day for range query
-    const endOfDay = new Date(completedDate);
-    endOfDay.setHours(23, 59, 59, 999);
-
-
-    // Find task (owner + soft delete check)
-    const completion = await prisma.taskCompletion.findFirst({
+    const completion = await prisma.taskDailyCompletion.findUnique({
         where: {
-            taskId,
-            userId,
-            completedDate: {
-                gte: completedDate, // greater than or equal to start of day
-                lte: endOfDay,      // less than or equal to end of day
-            },
-
+            taskId_completedDate: {
+                taskId,
+                completedDate
+            }
         }
     });
 
-    if (!completion) {
+    if (!completion || completion.userId !== userId) {
         throw new ApiError(404, "Task completion not found");
     }
 
-    // delete task completion
-    await prisma.taskCompletion.delete({
-        where: {
-            id: completion.id
-        }
+    await prisma.taskDailyCompletion.delete({
+        where: { id: completion.id }
     });
+};
 
-    return;
-}
-
-
-export const getTaskCompletion = async (userId, taskId) => {
-
+/**
+ * Get task daily completion history
+ */
+export const getTaskCompletionHistory = async (userId, taskId) => {
     // Verify task
     const task = await prisma.task.findFirst({
         where: {
             id: taskId,
             userId,
             deletedAt: null
-        },
+        }
     });
 
     if (!task) {
         throw new ApiError(404, "Task not found");
     }
 
-    // Fetch task completion history
-    const completion = await prisma.taskCompletion.findMany({
+    return prisma.taskDailyCompletion.findMany({
         where: {
             taskId,
             userId
@@ -116,75 +107,57 @@ export const getTaskCompletion = async (userId, taskId) => {
             completedAt: true
         }
     });
+};
 
-    if (!completion) {
-        throw new ApiError(404, "Task completion history not found");
-    }
-
-    return completion;
-}
-
-
+/**
+ * Bulk complete tasks for a specific day
+ */
 export const completeBulkTasks = async (userId, taskIds, date) => {
-
     if (!Array.isArray(taskIds) || taskIds.length === 0) {
-        throw new ApiError(400, "Invalid taskIds");
+        throw new ApiError(400, "taskIds must be a non-empty array");
     }
 
-    const completedDate = date ? new Date(date) : new Date();
-    completedDate.setHours(0, 0, 0, 0);
+    const completedDate = normalizeDate(date);
 
-    const completedAt = new Date();
-
-    // Verify tasks
+    // 1️⃣ Verify tasks
     const tasks = await prisma.task.findMany({
         where: {
-            id: {
-                in: taskIds
-            },
+            id: { in: taskIds },
             userId,
             deletedAt: null
         },
-        select: {
-            id: true
-        }
+        select: { id: true }
     });
 
-    if (tasks.length === 0) {
+    if (!tasks.length) {
         throw new ApiError(404, "No valid tasks found");
     }
 
-    const validTaskIds = tasks.map(task => task.id);
+    const validTaskIds = tasks.map(t => t.id);
 
-    // check if tasks are already completed
-    const taskCompletions = await prisma.taskCompletion.findMany({
+    // 2️⃣ Find already completed
+    const existing = await prisma.taskDailyCompletion.findMany({
         where: {
-            taskId: {
-                in: validTaskIds
-            },
+            taskId: { in: validTaskIds },
             completedDate
         },
-        select: {
-            taskId: true
-        }
+        select: { taskId: true }
     });
 
-    const alreadyCompletedTaskIds = new Set(taskCompletions.map(completion => completion.taskId));
+    const completedSet = new Set(existing.map(e => e.taskId));
 
-    // Prepare bulk insert data
-    const newCompletions = validTaskIds
-        .filter(taskId => !alreadyCompletedTaskIds.has(taskId))
+    // 3️⃣ Prepare inserts
+    const toCreate = validTaskIds
+        .filter(id => !completedSet.has(id))
         .map(taskId => ({
             taskId,
             userId,
-            completedDate,
-            completedAt
+            completedDate
         }));
 
-    // Insert in bulk
-    if (newCompletions.length > 0) {
-        await prisma.taskCompletion.createMany({
-            data: newCompletions,
+    if (toCreate.length) {
+        await prisma.taskDailyCompletion.createMany({
+            data: toCreate,
             skipDuplicates: true
         });
     }
@@ -192,7 +165,7 @@ export const completeBulkTasks = async (userId, taskIds, date) => {
     return {
         requested: taskIds.length,
         valid: validTaskIds.length,
-        completed: newCompletions.length,
-        skipped: alreadyCompletedTaskIds.size
+        completed: toCreate.length,
+        skipped: completedSet.size
     };
-}
+};

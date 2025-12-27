@@ -9,7 +9,7 @@ This module handles marking scheduled tasks as completed, undoing completion, an
 ## 1. Complete Schedule
 **Endpoint:** `POST /:id/complete`
 
-Marks a specific schedule as completed.
+Marks a specific schedule as completed for a specific date (defaulting to today).
 
 ### Path Parameters
 | Field | Type | Required | Description |
@@ -21,6 +21,11 @@ Marks a specific schedule as completed.
 |-----|-------|----------|-------------|
 | `Authorization` | `Bearer <token>` | **Yes** | JWT access token |
 
+### Request Body
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `date` | string | No | Date of completion (YYYY-MM-DD). Defaults to today. |
+
 ### Success Response (201 Created)
 ```json
 {
@@ -30,7 +35,7 @@ Marks a specific schedule as completed.
     "id": 1,
     "scheduleId": 10,
     "userId": "user-uuid",
-    "completedAt": "2023-12-25T10:00:00.000Z"
+    "completedOn": "2023-12-25T00:00:00.000Z"
   }
 }
 ```
@@ -40,7 +45,7 @@ Marks a specific schedule as completed.
 ## 2. Undo Completion
 **Endpoint:** `DELETE /:id/complete`
 
-Reverts the completion status of a schedule.
+Reverts the completion status of a schedule for a specific date.
 
 ### Path Parameters
 | Field | Type | Required | Description |
@@ -51,6 +56,11 @@ Reverts the completion status of a schedule.
 | Key | Value | Required | Description |
 |-----|-------|----------|-------------|
 | `Authorization` | `Bearer <token>` | **Yes** | JWT access token |
+
+### Request Body
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `date` | string | No | Date of completion to undo (YYYY-MM-DD). Defaults to today. |
 
 ### Success Response (200 OK)
 ```json
@@ -65,7 +75,7 @@ Reverts the completion status of a schedule.
 ## 3. Bulk Complete
 **Endpoint:** `POST /complete-bulk`
 
-Marks multiple schedules as completed in a single request. Skips already completed schedules.
+Marks multiple schedules as completed for a specific date. Skips already completed schedules.
 
 ### Headers
 | Key | Value | Required | Description |
@@ -76,6 +86,7 @@ Marks multiple schedules as completed in a single request. Skips already complet
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `scheduleIds` | number[] | **Yes** | Array of Schedule IDs |
+| `date` | string | No | Date of completion (YYYY-MM-DD). Defaults to today. |
 
 ### Success Response (201 Created)
 ```json
@@ -84,6 +95,7 @@ Marks multiple schedules as completed in a single request. Skips already complet
   "message": "Schedules completed successfully",
   "data": {
     "requested": 3,
+    "valid": 3,
     "completed": 2,
     "skipped": 1
   }
@@ -111,6 +123,7 @@ Retrieves the user's history of completed and missed schedules.
       {
         "scheduleId": 10,
         "taskTitle": "Morning Workout",
+        "completedOn": "2023-12-25T00:00:00.000Z",
         "completedAt": "2023-12-25T07:30:00.000Z",
         "status": "COMPLETED"
       }
@@ -119,6 +132,7 @@ Retrieves the user's history of completed and missed schedules.
       {
         "scheduleId": 5,
         "taskTitle": "Weekly Review",
+        "missedOn": "2023-12-24T00:00:00.000Z",
         "missedAt": "2023-12-24T23:59:59.000Z",
         "status": "MISSED"
       }

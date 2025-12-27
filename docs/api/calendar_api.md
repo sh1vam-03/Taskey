@@ -30,30 +30,30 @@ Retrieves the schedule and task status for a specific day.
     "date": "2023-12-25",
     "schedules": [
       {
+        "type": "SCHEDULED",
         "scheduleId": 1,
         "taskId": "uuid-1",
         "title": "Morning Standup",
         "priority": "HIGH",
         "startTime": "09:00",
         "endTime": "09:30",
-        "status": "COMPLETED",
-        "notes": "Discuss blockers"
+        "status": "COMPLETED"
       },
       {
-        "scheduleId": 2,
-        "taskId": "uuid-2",
-        "title": "Client Meeting",
-        "priority": "MEDIUM",
-        "startTime": "14:00",
-        "endTime": "15:00",
-        "status": "PENDING",
-        "notes": null
+        "type": "UNSCHEDULED",
+        "taskId": "uuid-3",
+        "title": "Daily Journal",
+        "priority": "LOW",
+        "startTime": null,
+        "endTime": null,
+        "status": "PENDING"
       }
     ]
   }
 }
 ```
-*Status values*: `PENDING` (Scheduled), `COMPLETED` (Done), `MISSED` (Past due date)
+*Status values*: `PENDING`, `COMPLETED`, `MISSED`
+*Type values*: `SCHEDULED`, `UNSCHEDULED`
 
 ---
 
