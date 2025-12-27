@@ -9,6 +9,7 @@ import taskCompletionRoutes from "./taskCompletion.routes.js";
 import categoryRoutes from "./category.routes.js";
 import calendarRoutes from "./calendar.routes.js";
 import scheduleRoutes from "./schedule.routes.js";
+import scheduleCompletionRoutes from "./scheduleCompletion.routes.js";
 
 router.use("/api", healthRoutes);
 router.use("/api/public-pages", publicPagesRoutes);
@@ -18,5 +19,6 @@ router.use("/api/tasks", taskCompletionRoutes);
 router.use("/api/categories", categoryRoutes);
 router.use("/api/calendar", calendarRoutes);
 router.use("/api/schedules", scheduleRoutes);
+router.use("/api/schedules", scheduleCompletionRoutes);
 
 export default router;

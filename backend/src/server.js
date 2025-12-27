@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import app from "./app.js";
 import prisma from "./config/db.js";
+import "./cron/missedSchedule.cron.js";
 
 
 dotenv.config();

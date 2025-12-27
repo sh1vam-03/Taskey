@@ -27,50 +27,31 @@ export const getDayCalendar = async (dateString, userId) => {
     const completions = await prisma.taskCompletion.findMany({
         where: {
             userId,
-            completedDate: { gte: date, lte: date }
+            scheduleId: { not: null }
         },
         select: {
-            taskId: true,
-            completedDate: true,
+            scheduleId: true,
             completedAt: true
         }
     });
 
-
-    const completionMap = new Map();
-
-    /*
-     Map structure:
-     {
-       "2025-12-25" => Map(taskId => completedAt)
-     }
-    */
-
+    const completedMap = new Map();
     for (const c of completions) {
-        const dateKey = c.completedDate.toISOString().slice(0, 10);
-
-        if (!completionMap.has(dateKey)) {
-            completionMap.set(dateKey, new Map());
-        }
-
-        completionMap.get(dateKey).set(c.taskId, c.completedAt);
+        completedMap.set(c.scheduleId, c.completedAt);
     }
 
-
-
-    const dayKey = date.toISOString().slice(0, 10);
+    const today = todayUTC();
 
     return {
         date: dateString,
         schedules: schedules
-            .filter(schedule => appliesOnDate(schedule, date))
+            .filter(s => appliesOnDate(s, date))
             .map(schedule => {
-                const completedAt =
-                    completionMap.get(dayKey)?.get(schedule.taskId) ?? null;
+                const completedAt = completedMap.get(schedule.id) ?? null;
 
                 let status = "PENDING";
                 if (completedAt) status = "COMPLETED";
-                else if (date < todayUTC()) status = "MISSED";
+                else if (date < today) status = "MISSED";
 
                 return {
                     scheduleId: schedule.id,
@@ -85,8 +66,8 @@ export const getDayCalendar = async (dateString, userId) => {
                 };
             })
     };
-
 };
+
 
 
 export const getWeekCalendar = async (dateString, userId) => {
@@ -111,71 +92,52 @@ export const getWeekCalendar = async (dateString, userId) => {
     });
 
     const completions = await prisma.taskCompletion.findMany({
-        where: {
-            userId,
-            completedDate: { gte: weekStart, lte: weekEnd }
-        },
-        select: {
-            taskId: true,
-            completedDate: true,
-            completedAt: true
-        }
+        where: { userId },
+        select: { scheduleId: true, completedAt: true }
     });
 
+    const completedMap = new Map(
+        completions.map(c => [c.scheduleId, c.completedAt])
+    );
 
-    const completionMap = new Map();
-
-    /*
-     Map structure:
-     {
-       "2025-12-25" => Map(taskId => completedAt)
-     }
-    */
-
-    for (const c of completions) {
-        const dateKey = c.completedDate.toISOString().slice(0, 10);
-
-        if (!completionMap.has(dateKey)) {
-            completionMap.set(dateKey, new Map());
-        }
-
-        completionMap.get(dateKey).set(c.taskId, c.completedAt);
-    }
-
-
+    const today = todayUTC();
     const days = {};
+
     for (let d = new Date(weekStart); d <= weekEnd; d.setUTCDate(d.getUTCDate() + 1)) {
-        const key = d.toISOString().slice(0, 10);
-        days[key] = [];
+        const dayKey = d.toISOString().slice(0, 10);
+        days[dayKey] = [];
     }
 
     for (const schedule of schedules) {
         for (const dayKey of Object.keys(days)) {
             const dayDate = new Date(`${dayKey}T00:00:00Z`);
-            if (appliesOnDate(schedule, dayDate)) {
-                const completedAt =
-                    completionMap.get(dayKey)?.get(schedule.taskId) ?? null;
+            if (!appliesOnDate(schedule, dayDate)) continue;
 
-                let status = "PENDING";
-                if (completedAt) status = "COMPLETED";
-                else if (dayDate < todayUTC()) status = "MISSED";
+            const completedAt = completedMap.get(schedule.id) ?? null;
 
-                days[dayKey].push({
-                    scheduleId: schedule.id,
-                    taskId: schedule.task.id,
-                    title: schedule.task.title,
-                    notes: schedule.notes,
-                    priority: schedule.task.priority,
-                    startTime: formatTime(schedule.startTime),
-                    endTime: formatTime(schedule.endTime),
-                    status,
-                    completedAt
-                });
-            }
+            let status = "PENDING";
+            if (completedAt) status = "COMPLETED";
+            else if (dayDate < today) status = "MISSED";
+
+            days[dayKey].push({
+                scheduleId: schedule.id,
+                taskId: schedule.task.id,
+                title: schedule.task.title,
+                notes: schedule.notes,
+                priority: schedule.task.priority,
+                startTime: formatTime(schedule.startTime),
+                endTime: formatTime(schedule.endTime),
+                status,
+                completedAt
+            });
         }
     }
 
-    return { weekStart, weekEnd, days };
+    return {
+        weekStart: weekStart.toISOString().slice(0, 10),
+        weekEnd: weekEnd.toISOString().slice(0, 10),
+        days
+    };
 };
 
 
@@ -200,66 +162,43 @@ export const getMonthCalendar = async (year, month, userId) => {
     });
 
     const completions = await prisma.taskCompletion.findMany({
-        where: {
-            userId,
-            completedDate: { gte: monthStart, lte: monthEnd }
-        },
-        select: {
-            taskId: true,
-            completedDate: true,
-            completedAt: true
-        }
+        where: { userId },
+        select: { scheduleId: true, completedAt: true }
     });
 
+    const completedMap = new Map(
+        completions.map(c => [c.scheduleId, c.completedAt])
+    );
 
-    const completionMap = new Map();
-
-    /*
-     Map structure:
-     {
-       "2025-12-25" => Map(taskId => completedAt)
-     }
-    */
-
-    for (const c of completions) {
-        const dateKey = c.completedDate.toISOString().slice(0, 10);
-
-        if (!completionMap.has(dateKey)) {
-            completionMap.set(dateKey, new Map());
-        }
-
-        completionMap.get(dateKey).set(c.taskId, c.completedAt);
-    }
-
-
+    const today = todayUTC();
     const days = {};
+
     for (let d = new Date(monthStart); d <= monthEnd; d.setUTCDate(d.getUTCDate() + 1)) {
-        const key = d.toISOString().slice(0, 10);
-        days[key] = [];
+        days[d.toISOString().slice(0, 10)] = [];
     }
 
     for (const schedule of schedules) {
-        for (const key of Object.keys(days)) {
-            const dayDate = new Date(`${key}T00:00:00Z`);
-            if (appliesOnDate(schedule, dayDate)) {
-                const dayKey = dayDate.toISOString().slice(0, 10);
-                const completedAt = completionMap.get(dayKey)?.get(schedule.taskId) ?? null;
+        for (const dayKey of Object.keys(days)) {
+            const dayDate = new Date(`${dayKey}T00:00:00Z`);
+            if (!appliesOnDate(schedule, dayDate)) continue;
 
-                let status = "PENDING";
-                if (completedAt) status = "COMPLETED";
-                else if (dayDate < todayUTC()) status = "MISSED";
-                days[key].push({
-                    scheduleId: schedule.id,
-                    taskId: schedule.task.id,
-                    title: schedule.task.title,
-                    notes: schedule.notes,
-                    priority: schedule.task.priority,
-                    startTime: formatTime(schedule.startTime),
-                    endTime: formatTime(schedule.endTime),
-                    status,
-                    completedAt
-                });
-            }
+            const completedAt = completedMap.get(schedule.id) ?? null;
+
+            let status = "PENDING";
+            if (completedAt) status = "COMPLETED";
+            else if (dayDate < today) status = "MISSED";
+
+            days[dayKey].push({
+                scheduleId: schedule.id,
+                taskId: schedule.task.id,
+                title: schedule.task.title,
+                notes: schedule.notes,
+                priority: schedule.task.priority,
+                startTime: formatTime(schedule.startTime),
+                endTime: formatTime(schedule.endTime),
+                status,
+                completedAt
+            });
         }
     }
 
@@ -268,7 +207,6 @@ export const getMonthCalendar = async (year, month, userId) => {
         days
     };
 };
-
 
 /**
  * Check if schedule applies on a given date
