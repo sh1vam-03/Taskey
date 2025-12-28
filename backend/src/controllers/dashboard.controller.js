@@ -3,7 +3,9 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 
 /**
- * GET /api/dashboard/overview
+ * @routes GET /api/dashboard/overview
+ * @desc Get dashboard overview
+ * @access Private
  */
 export const getDashboardOverview = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
@@ -18,7 +20,9 @@ export const getDashboardOverview = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /api/dashboard/today
+ * @routes GET /api/dashboard/today
+ * @desc Get today's dashboard
+ * @access Private
  */
 export const getTodayDashboard = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
@@ -33,7 +37,9 @@ export const getTodayDashboard = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /api/dashboard/weekly?date=YYYY-MM-DD
+ * @routes GET /api/dashboard/weekly?date=YYYY-MM-DD
+ * @desc Get weekly dashboard
+ * @access Private
  */
 export const getWeeklyDashboard = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
@@ -52,7 +58,9 @@ export const getWeeklyDashboard = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /api/dashboard/monthly?year=YYYY&month=MM
+ * @routes GET /api/dashboard/monthly?year=YYYY&month=MM
+ * @desc Get monthly dashboard
+ * @access Private
  */
 export const getMonthlyDashboard = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
@@ -72,7 +80,9 @@ export const getMonthlyDashboard = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /api/dashboard/streaks
+ * @routes GET /api/dashboard/streaks
+ * @desc Get streak overview
+ * @access Private
  */
 export const getStreakOverview = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
@@ -87,7 +97,9 @@ export const getStreakOverview = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /api/dashboard/performance/daily?date=YYYY-MM-DD
+ * @routes GET /api/dashboard/performance/daily?date=YYYY-MM-DD
+ * @desc Get daily performance
+ * @access Private
  */
 export const getDailyPerformance = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
@@ -106,7 +118,9 @@ export const getDailyPerformance = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /api/dashboard/performance/weekly?date=YYYY-MM-DD
+ * @routes GET /api/dashboard/performance/weekly?date=YYYY-MM-DD
+ * @desc Get weekly performance
+ * @access Private
  */
 export const getWeeklyPerformance = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
@@ -125,7 +139,9 @@ export const getWeeklyPerformance = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /api/dashboard/performance/monthly?year=YYYY&month=MM
+ * @routes GET /api/dashboard/performance/monthly?year=YYYY&month=MM
+ * @desc Get monthly performance
+ * @access Private
  */
 export const getMonthlyPerformance = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
@@ -145,7 +161,9 @@ export const getMonthlyPerformance = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /api/dashboard/streak-calendar?days=90
+ * @routes GET /api/dashboard/streak-calendar?days=90
+ * @desc Get streak calendar
+ * @access Private
  */
 export const getStreakCalendar = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
