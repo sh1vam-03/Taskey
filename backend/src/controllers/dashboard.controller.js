@@ -13,3 +13,15 @@ export const getDashboardOverview = asyncHandler(async (req, res) => {
         data: overview
     });
 });
+
+export const getTodayDashboard = asyncHandler(async (req, res) => {
+    const { userId } = req.user;
+
+    const todayDashboard = await dashboardService.getTodayDashboard(userId);
+
+    res.status(200).json({
+        success: true,
+        message: "Today's dashboard fetched successfully",
+        data: todayDashboard
+    });
+});
