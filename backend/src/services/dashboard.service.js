@@ -563,138 +563,154 @@ const appliesOnDate = (schedule, date) => {
 
 
 // Streak engine
-export const isPerfectDay = async (userId, date) => {
-    const day = startOfUTCDate(date);
-    const nextDay = new Date(day);
-    nextDay.setUTCDate(day.getUTCDate() + 1);
+export const buildPerfectDayMap = async (userId, days = 365) => {
+    const today = startOfUTCDate();
+    const start = new Date(today);
+    start.setUTCDate(today.getUTCDate() - (days - 1));
 
-    /* ---------------- SCHEDULED TASKS ---------------- */
-
-    const schedules = await prisma.schedule.findMany({
-        where: {
-            userId,
-            scheduleDate: { lte: day },
-            OR: [
-                { repeatUntil: null },
-                { repeatUntil: { gte: day } }
-            ]
-        }
-    });
-
-    const applicableSchedules = schedules.filter(s =>
-        appliesOnDate(s, day)
-    );
-
-    if (applicableSchedules.length > 0) {
-        const [completed, missed] = await Promise.all([
-            prisma.scheduleCompletion.count({
-                where: {
-                    userId,
-                    completedOn: day,
-                    scheduleId: { in: applicableSchedules.map(s => s.id) }
-                }
-            }),
-            prisma.missedSchedule.count({
-                where: {
-                    userId,
-                    missedOn: day,
-                    scheduleId: { in: applicableSchedules.map(s => s.id) }
-                }
-            })
-        ]);
-
-        if (missed > 0) return false;
-        if (completed !== applicableSchedules.length) return false;
-    }
-
-    /* ---------------- UNSCHEDULED TASKS ---------------- */
-
-    const tasks = await prisma.task.findMany({
-        where: {
-            userId,
-            deletedAt: null,
-            schedules: { none: {} },
-            createdAt: { gte: day, lt: nextDay }
-        }
-    });
-
-    if (tasks.length > 0) {
-        const completedTasks = await prisma.taskDailyCompletion.count({
+    const [
+        schedules,
+        scheduleCompletions,
+        missedSchedules,
+        unscheduledTasks,
+        dailyCompletions
+    ] = await Promise.all([
+        prisma.schedule.findMany({
             where: {
                 userId,
-                completedDate: day,
-                taskId: { in: tasks.map(t => t.id) }
+                scheduleDate: { lte: today },
+                OR: [
+                    { repeatUntil: null },
+                    { repeatUntil: { gte: start } }
+                ]
             }
-        });
+        }),
 
-        if (completedTasks !== tasks.length) return false;
-    }
+        prisma.scheduleCompletion.findMany({
+            where: {
+                userId,
+                completedOn: { gte: start, lte: today }
+            }
+        }),
 
-    return true;
-};
+        prisma.missedSchedule.findMany({
+            where: {
+                userId,
+                missedOn: { gte: start, lte: today }
+            }
+        }),
 
-// Curent Streak
+        prisma.task.findMany({
+            where: {
+                userId,
+                deletedAt: null,
+                schedules: { none: {} },
+                createdAt: { gte: start, lte: today }
+            }
+        }),
 
-export const getCurrentStreak = async (userId) => {
-    let streak = 0;
-    let cursor = startOfUTCDate();
+        prisma.taskDailyCompletion.findMany({
+            where: {
+                userId,
+                completedDate: { gte: start, lte: today }
+            }
+        })
+    ]);
 
-    while (true) {
-        const perfect = await isPerfectDay(userId, cursor);
-        if (!perfect) break;
+    /* ---------------- MAPS ---------------- */
 
-        streak++;
-        cursor.setUTCDate(cursor.getUTCDate() - 1);
-    }
+    const completedScheduleMap = new Map();
+    scheduleCompletions.forEach(c => {
+        const k = dayKey(c.completedOn);
+        if (!completedScheduleMap.has(k)) completedScheduleMap.set(k, new Set());
+        completedScheduleMap.get(k).add(c.scheduleId);
+    });
 
-    return streak;
-};
+    const missedScheduleMap = new Map();
+    missedSchedules.forEach(m => {
+        const k = dayKey(m.missedOn);
+        if (!missedScheduleMap.has(k)) missedScheduleMap.set(k, new Set());
+        missedScheduleMap.get(k).add(m.scheduleId);
+    });
 
-// Long Streak
-export const getLongestStreak = async (userId, days = 365) => {
-    const today = startOfUTCDate();
-    let maxStreak = 0;
-    let current = 0;
+    const dailyTaskMap = new Map();
+    dailyCompletions.forEach(c => {
+        const k = dayKey(c.completedDate);
+        if (!dailyTaskMap.has(k)) dailyTaskMap.set(k, new Set());
+        dailyTaskMap.get(k).add(c.taskId);
+    });
 
+    /* ---------------- PERFECT DAY MAP ---------------- */
+
+    const perfectMap = {};
     for (let i = 0; i < days; i++) {
         const d = new Date(today);
         d.setUTCDate(today.getUTCDate() - i);
+        const key = dayKey(d);
 
-        const perfect = await isPerfectDay(userId, d);
+        const applicableSchedules = schedules.filter(s =>
+            appliesOnDate(s, d)
+        );
 
-        if (perfect) {
-            current++;
-            maxStreak = Math.max(maxStreak, current);
+        const unscheduledForDay = unscheduledTasks.filter(
+            t => dayKey(startOfUTCDate(t.createdAt)) === key
+        );
+
+        // 🚨 no work → NOT perfect
+        if (applicableSchedules.length === 0 && unscheduledForDay.length === 0) {
+            perfectMap[key] = false;
+            continue;
+        }
+
+        // Scheduled check
+        if (applicableSchedules.length > 0) {
+            const completed = completedScheduleMap.get(key) ?? new Set();
+            const missed = missedScheduleMap.get(key) ?? new Set();
+
+            if (missed.size > 0 ||
+                completed.size !== applicableSchedules.length) {
+                perfectMap[key] = false;
+                continue;
+            }
+        }
+
+        // Unscheduled check
+        if (unscheduledForDay.length > 0) {
+            const completedTasks = dailyTaskMap.get(key) ?? new Set();
+            if (completedTasks.size !== unscheduledForDay.length) {
+                perfectMap[key] = false;
+                continue;
+            }
+        }
+
+        perfectMap[key] = true;
+    }
+
+    return perfectMap;
+};
+
+
+// Current Streak
+export const getStreakOverview = async (userId) => {
+    const perfectMap = await buildPerfectDayMap(userId, 365);
+    const days = Object.keys(perfectMap).sort().reverse();
+
+    let current = 0;
+    for (const d of days) {
+        if (!perfectMap[d]) break;
+        current++;
+    }
+
+    let longest = 0;
+    let run = 0;
+    for (const d of days.reverse()) {
+        if (perfectMap[d]) {
+            run++;
+            longest = Math.max(longest, run);
         } else {
-            current = 0;
+            run = 0;
         }
     }
-
-    return maxStreak;
-};
-
-// Streak Calender
-export const getStreakCalendar = async (userId, days = 90) => {
-    const today = startOfUTCDate();
-    const calendar = {};
-
-    for (let i = 0; i < days; i++) {
-        const d = new Date(today);
-        d.setUTCDate(today.getUTCDate() - i);
-
-        const key = dayKey(d);
-        calendar[key] = await isPerfectDay(userId, d);
-    }
-
-    return calendar;
-};
-
-// Unified Streak
-export const getStreakOverview = async (userId) => {
-    const [current, longest] = await Promise.all([
-        getCurrentStreak(userId),
-        getLongestStreak(userId)
-    ]);
 
     return {
         currentStreak: current,
@@ -703,16 +719,25 @@ export const getStreakOverview = async (userId) => {
     };
 };
 
+// Streak Calender
+export const getStreakCalendar = async (userId, days = 90) => {
+    const map = await buildPerfectDayMap(userId, days);
+    return map;
+};
+
 
 
 // Daily performance
 export const getDailyPerformance = async (userId, date = new Date()) => {
     const day = startOfUTCDate(date);
+    const key = dayKey(day);
 
-    const perfect = await isPerfectDay(userId, day);
+    const map = await buildPerfectDayMap(userId, day, day);
+
+    const perfect = map[key] === true;
 
     return {
-        date: dayKey(day),
+        date: key,
         perfect,
         score: perfect ? 100 : 0
     };
@@ -722,20 +747,19 @@ export const getDailyPerformance = async (userId, date = new Date()) => {
 export const getWeeklyPerformance = async (userId, date = new Date()) => {
     const { weekStart, weekEnd } = getWeekRange(date);
 
-    const breakdown = {};
-    let perfectDays = 0;
+    const map = await buildPerfectDayMap(userId, weekStart, weekEnd);
 
-    // Sequential is intentional (DB safety)
+    let perfectDays = 0;
+    const breakdown = {};
+
     for (
         let d = new Date(weekStart);
         d <= weekEnd;
         d.setUTCDate(d.getUTCDate() + 1)
     ) {
         const key = dayKey(d);
-        const perfect = await isPerfectDay(userId, d);
-
-        breakdown[key] = perfect;
-        if (perfect) perfectDays++;
+        breakdown[key] = map[key] === true;
+        if (breakdown[key]) perfectDays++;
     }
 
     return {
@@ -750,10 +774,20 @@ export const getWeeklyPerformance = async (userId, date = new Date()) => {
 
 // Monthly performance
 export const getMonthlyPerformance = async (userId, year, month) => {
-    const { start, end } = getMonthRange(year, month);
+    year = Number(year);
+    month = Number(month);
+
+    if (!year || !month || month < 1 || month > 12) {
+        throw new Error("Invalid year or month");
+    }
+
+    const start = new Date(Date.UTC(year, month - 1, 1));
+    const end = new Date(Date.UTC(year, month, 0));
 
     const today = startOfUTCDate();
     const effectiveEnd = end > today ? today : end;
+
+    const map = await buildPerfectDayMap(userId, start, effectiveEnd);
 
     let perfectDays = 0;
     let totalDays = 0;
@@ -765,11 +799,9 @@ export const getMonthlyPerformance = async (userId, year, month) => {
         d.setUTCDate(d.getUTCDate() + 1)
     ) {
         const key = dayKey(d);
-        const perfect = await isPerfectDay(userId, d);
-
-        breakdown[key] = perfect;
+        breakdown[key] = map[key] === true;
         totalDays++;
-        if (perfect) perfectDays++;
+        if (breakdown[key]) perfectDays++;
     }
 
     return {
@@ -782,3 +814,4 @@ export const getMonthlyPerformance = async (userId, year, month) => {
         breakdown
     };
 };
+

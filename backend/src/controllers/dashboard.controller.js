@@ -97,6 +97,24 @@ export const getStreakOverview = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @routes GET /api/dashboard/streak-calendar?days=90
+ * @desc Get streak calendar
+ * @access Private
+ */
+export const getStreakCalendar = asyncHandler(async (req, res) => {
+    const userId = req.user.userId;
+    const days = Number(req.query.days) || 90;
+
+    const data = await dashboardService.getStreakCalendar(userId, days);
+
+    res.status(200).json({
+        success: true,
+        message: "Streak calendar fetched successfully",
+        data
+    });
+});
+
+/**
  * @routes GET /api/dashboard/performance/daily?date=YYYY-MM-DD
  * @desc Get daily performance
  * @access Private
@@ -160,20 +178,4 @@ export const getMonthlyPerformance = asyncHandler(async (req, res) => {
     });
 });
 
-/**
- * @routes GET /api/dashboard/streak-calendar?days=90
- * @desc Get streak calendar
- * @access Private
- */
-export const getStreakCalendar = asyncHandler(async (req, res) => {
-    const userId = req.user.userId;
-    const days = Number(req.query.days) || 90;
 
-    const data = await dashboardService.getStreakCalendar(userId, days);
-
-    res.status(200).json({
-        success: true,
-        message: "Streak calendar fetched successfully",
-        data
-    });
-});
