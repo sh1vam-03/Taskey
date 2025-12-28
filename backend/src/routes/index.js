@@ -10,6 +10,7 @@ import categoryRoutes from "./category.routes.js";
 import calendarRoutes from "./calendar.routes.js";
 import scheduleRoutes from "./schedule.routes.js";
 import scheduleCompletionRoutes from "./scheduleCompletion.routes.js";
+import dashboardRoutes from "./dashboard.routes.js";
 
 router.use("/api", healthRoutes);
 router.use("/api/public-pages", publicPagesRoutes);
@@ -20,5 +21,6 @@ router.use("/api/categories", categoryRoutes);
 router.use("/api/calendar", calendarRoutes);
 router.use("/api/schedules", scheduleRoutes);
 router.use("/api/schedules", scheduleCompletionRoutes);
+router.use("/api/dashboard", dashboardRoutes);
 
 export default router;
