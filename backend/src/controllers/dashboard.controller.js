@@ -2,26 +2,160 @@ import * as dashboardService from "../services/dashboard.service.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 
+/**
+ * GET /api/dashboard/overview
+ */
 export const getDashboardOverview = asyncHandler(async (req, res) => {
-    const { userId } = req.user;
+    const userId = req.user.userId;
 
-    const overview = await dashboardService.getDashboardOverview(userId);
+    const data = await dashboardService.getDashboardOverview(userId);
 
     res.status(200).json({
         success: true,
         message: "Dashboard overview fetched successfully",
-        data: overview
+        data
     });
 });
 
+/**
+ * GET /api/dashboard/today
+ */
 export const getTodayDashboard = asyncHandler(async (req, res) => {
-    const { userId } = req.user;
+    const userId = req.user.userId;
 
-    const todayDashboard = await dashboardService.getTodayDashboard(userId);
+    const data = await dashboardService.getTodayDashboard(userId);
 
     res.status(200).json({
         success: true,
         message: "Today's dashboard fetched successfully",
-        data: todayDashboard
+        data
+    });
+});
+
+/**
+ * GET /api/dashboard/weekly?date=YYYY-MM-DD
+ */
+export const getWeeklyDashboard = asyncHandler(async (req, res) => {
+    const userId = req.user.userId;
+    const { date } = req.query;
+
+    const data = await dashboardService.getWeeklyDashboard(
+        userId,
+        date || new Date().toISOString().slice(0, 10)
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "Weekly dashboard fetched successfully",
+        data
+    });
+});
+
+/**
+ * GET /api/dashboard/monthly?year=YYYY&month=MM
+ */
+export const getMonthlyDashboard = asyncHandler(async (req, res) => {
+    const userId = req.user.userId;
+    const { year, month } = req.query;
+
+    const data = await dashboardService.getMonthlyDashboard(
+        userId,
+        Number(year),
+        Number(month)
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "Monthly dashboard fetched successfully",
+        data
+    });
+});
+
+/**
+ * GET /api/dashboard/streaks
+ */
+export const getStreakOverview = asyncHandler(async (req, res) => {
+    const userId = req.user.userId;
+
+    const data = await dashboardService.getStreakOverview(userId);
+
+    res.status(200).json({
+        success: true,
+        message: "Streak overview fetched successfully",
+        data
+    });
+});
+
+/**
+ * GET /api/dashboard/performance/daily?date=YYYY-MM-DD
+ */
+export const getDailyPerformance = asyncHandler(async (req, res) => {
+    const userId = req.user.userId;
+    const { date } = req.query;
+
+    const data = await dashboardService.getDailyPerformance(
+        userId,
+        date ? new Date(date) : new Date()
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "Daily performance fetched successfully",
+        data
+    });
+});
+
+/**
+ * GET /api/dashboard/performance/weekly?date=YYYY-MM-DD
+ */
+export const getWeeklyPerformance = asyncHandler(async (req, res) => {
+    const userId = req.user.userId;
+    const { date } = req.query;
+
+    const data = await dashboardService.getWeeklyPerformance(
+        userId,
+        date ? new Date(date) : new Date()
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "Weekly performance fetched successfully",
+        data
+    });
+});
+
+/**
+ * GET /api/dashboard/performance/monthly?year=YYYY&month=MM
+ */
+export const getMonthlyPerformance = asyncHandler(async (req, res) => {
+    const userId = req.user.userId;
+    const { year, month } = req.query;
+
+    const data = await dashboardService.getMonthlyPerformance(
+        userId,
+        Number(year),
+        Number(month)
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "Monthly performance fetched successfully",
+        data
+    });
+});
+
+/**
+ * GET /api/dashboard/streak-calendar?days=90
+ */
+export const getStreakCalendar = asyncHandler(async (req, res) => {
+    const userId = req.user.userId;
+    const days = Number(req.query.days) || 90;
+
+    const data = await dashboardService.getStreakCalendar(userId, days);
+
+    res.status(200).json({
+        success: true,
+        message: "Streak calendar fetched successfully",
+        data
     });
 });
