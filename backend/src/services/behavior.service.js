@@ -184,81 +184,87 @@ export const getBehaviorSummary = async (userId, days = 7) => {
     };
 };
 
+/**
+ * Explain why a productivity score was high or low
+ * Single-source-of-truth, deterministic & debuggable
+ */
 export const explainProductivityScore = async (userId, date) => {
-    if (!userId) throw new ApiError(401, "Unauthorized");
+    if (!userId) {
+        throw new ApiError(401, "Unauthorized");
+    }
 
-    const day = toUTCDate(date);
-    if (!day) throw new ApiError(400, "Invalid date");
+    const day = toUTCDate(date ?? new Date());
+    if (!day) {
+        throw new ApiError(400, "Invalid date");
+    }
 
     const key = day.toISOString().slice(0, 10);
 
-    /* ---------------- Fetch data ---------------- */
+    const [behavior, statsMap] = await Promise.all([
+        getBehaviorLogByDate(userId, day),
+        buildDailyStatsMap(userId, day, day)
+    ]);
 
-    const behavior = await getBehaviorLogByDate(userId, day);
-
-    const statsMap = await buildDailyStatsMap(userId, day, day);
     const stats = statsMap[key] ?? {
         total: 0,
         completed: 0,
         missed: 0
     };
 
+
     if (!behavior) {
         return {
             date: key,
             finalScore: 0,
-            reason: "No behavior log for this day"
+            explanation: "No behavior log found for this day",
+            breakdown: null,
+            penalties: [],
+            bonuses: [],
+            tips: ["Log your daily behavior to track productivity"]
         };
     }
 
-    /* ---------------- Base score ---------------- */
+
+    const pointsPerTask =
+        stats.total > 0 ? 100 / stats.total : 0;
 
     const baseScore =
         stats.total > 0
             ? Math.round((stats.completed / stats.total) * 100)
             : 0;
 
-    const factors = [];
-    const positives = [];
-    const tips = [];
 
-    /* ---------------- Missed tasks ---------------- */
+    const penalties = [];
 
     if (stats.missed > 0) {
-        const impact = stats.missed * -5;
-
-        factors.push({
-            type: "MISS",
-            impact,
-            message: `You missed ${stats.missed} scheduled task${stats.missed > 1 ? "s" : ""}`
+        penalties.push({
+            type: "MISSED_TASK",
+            impact: stats.missed * -5,
+            message: `Missed ${stats.missed} scheduled task${stats.missed > 1 ? "s" : ""}`
         });
-
-        tips.push("Try completing all scheduled tasks");
     }
 
-    /* ---------------- Sleep ---------------- */
-
-    if (behavior.sleepHours != null && behavior.sleepHours < 5) {
-        factors.push({
-            type: "SLEEP",
+    if (
+        behavior.sleepHours != null &&
+        behavior.sleepHours < 5
+    ) {
+        penalties.push({
+            type: "LOW_SLEEP",
             impact: -5,
             message: "Sleep was less than 5 hours"
         });
-
-        tips.push("Aim for at least 6 hours of sleep");
     }
 
-    /* ---------------- Exercise ---------------- */
+    const bonuses = [];
 
     if (behavior.exercise === true) {
-        positives.push({
+        bonuses.push({
             type: "EXERCISE",
             impact: +3,
-            message: "Exercise added a small productivity boost"
+            message: "Exercise improved focus and energy"
         });
     }
 
-    /* ---------------- Final score ---------------- */
 
     const finalScore = calculateProductivityScore({
         ...stats,
@@ -266,12 +272,37 @@ export const explainProductivityScore = async (userId, date) => {
         exercise: behavior.exercise
     });
 
+
+    const tips = [];
+
+    if (stats.completed < stats.total) {
+        tips.push("Completing all tasks increases your base score");
+    }
+
+    if (behavior.sleepHours != null && behavior.sleepHours < 6) {
+        tips.push("Try getting at least 6 hours of sleep");
+    }
+
+    if (!behavior.exercise) {
+        tips.push("Light exercise can slightly boost productivity");
+    }
+
+
     return {
         date: key,
+
         baseScore,
+
+        breakdown: {
+            totalTasks: stats.total,
+            completedTasks: stats.completed,
+            pointsPerTask: Number(pointsPerTask.toFixed(2))
+        },
+
+        penalties,
+        bonuses,
+
         finalScore,
-        factors,
-        positives,
         tips
     };
 };
