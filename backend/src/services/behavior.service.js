@@ -183,3 +183,95 @@ export const getBehaviorSummary = async (userId, days = 7) => {
         daysLogged: logs.length
     };
 };
+
+export const explainProductivityScore = async (userId, date) => {
+    if (!userId) throw new ApiError(401, "Unauthorized");
+
+    const day = toUTCDate(date);
+    if (!day) throw new ApiError(400, "Invalid date");
+
+    const key = day.toISOString().slice(0, 10);
+
+    /* ---------------- Fetch data ---------------- */
+
+    const behavior = await getBehaviorLogByDate(userId, day);
+
+    const statsMap = await buildDailyStatsMap(userId, day, day);
+    const stats = statsMap[key] ?? {
+        total: 0,
+        completed: 0,
+        missed: 0
+    };
+
+    if (!behavior) {
+        return {
+            date: key,
+            finalScore: 0,
+            reason: "No behavior log for this day"
+        };
+    }
+
+    /* ---------------- Base score ---------------- */
+
+    const baseScore =
+        stats.total > 0
+            ? Math.round((stats.completed / stats.total) * 100)
+            : 0;
+
+    const factors = [];
+    const positives = [];
+    const tips = [];
+
+    /* ---------------- Missed tasks ---------------- */
+
+    if (stats.missed > 0) {
+        const impact = stats.missed * -5;
+
+        factors.push({
+            type: "MISS",
+            impact,
+            message: `You missed ${stats.missed} scheduled task${stats.missed > 1 ? "s" : ""}`
+        });
+
+        tips.push("Try completing all scheduled tasks");
+    }
+
+    /* ---------------- Sleep ---------------- */
+
+    if (behavior.sleepHours != null && behavior.sleepHours < 5) {
+        factors.push({
+            type: "SLEEP",
+            impact: -5,
+            message: "Sleep was less than 5 hours"
+        });
+
+        tips.push("Aim for at least 6 hours of sleep");
+    }
+
+    /* ---------------- Exercise ---------------- */
+
+    if (behavior.exercise === true) {
+        positives.push({
+            type: "EXERCISE",
+            impact: +3,
+            message: "Exercise added a small productivity boost"
+        });
+    }
+
+    /* ---------------- Final score ---------------- */
+
+    const finalScore = calculateProductivityScore({
+        ...stats,
+        sleepHours: behavior.sleepHours,
+        exercise: behavior.exercise
+    });
+
+    return {
+        date: key,
+        baseScore,
+        finalScore,
+        factors,
+        positives,
+        tips
+    };
+};

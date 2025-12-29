@@ -57,3 +57,23 @@ export const getBehaviorSummary = asyncHandler(async (req, res) => {
         data: summary
     });
 });
+
+
+export const explainScore = asyncHandler(async (req, res) => {
+    const userId = req.user?.userId;
+    if (!userId) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const { date } = req.params;
+    if (!date) {
+        return res.status(400).json({ success: false, message: "Date is required" });
+    }
+
+    const explanation = await behaviorService.explainProductivityScore(userId, date);
+
+    res.json({
+        success: true,
+        data: explanation
+    });
+});
