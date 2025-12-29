@@ -235,13 +235,12 @@ model MissedSchedule {
 //////////////////////
 
 model BehaviorLog {
-  id                String   @id @default(uuid())
-  date              DateTime @db.Date
-  mood              Mood
-  productivityScore Int
-  sleepHours        Float?
-  exercise          Boolean  @default(false)
-  notes             String?
+  id         String   @id @default(uuid())
+  date       DateTime @db.Date
+  mood       Mood
+  sleepHours Float?
+  exercise   Boolean  @default(false)
+  notes      String?
 
   createdAt DateTime @default(now())
 

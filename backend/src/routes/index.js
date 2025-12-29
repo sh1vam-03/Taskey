@@ -11,6 +11,7 @@ import calendarRoutes from "./calendar.routes.js";
 import scheduleRoutes from "./schedule.routes.js";
 import scheduleCompletionRoutes from "./scheduleCompletion.routes.js";
 import dashboardRoutes from "./dashboard.routes.js";
+import behaviorRoutes from "./behavior.routes.js";
 
 router.use("/api", healthRoutes);
 router.use("/api/public-pages", publicPagesRoutes);
@@ -22,5 +23,6 @@ router.use("/api/calendar", calendarRoutes);
 router.use("/api/schedules", scheduleRoutes);
 router.use("/api/schedules", scheduleCompletionRoutes);
 router.use("/api/dashboard", dashboardRoutes);
+router.use("/api/behavior", behaviorRoutes);
 
 export default router;
